@@ -41,7 +41,7 @@ Gen Art Pixels is a collaborative digital canvas platform where users create, sh
 
 1. WHEN a logged-in user wants to create a frame THEN the system SHALL display a creation dialog
 2. WHEN creating a frame THEN the system SHALL require title, description, keywords, and frame handle inputs
-3. WHEN creating a frame handle THEN the system SHALL enforce 3-100 characters with underscore and dash allowed
+3. WHEN creating a frame handle THEN the system SHALL enforce 3-100 characters with underscore and dash allowed and enforce uniqueness for the user.
 4. WHEN creating a frame THEN the system SHALL offer predefined size options: Quick Landscape (128×72), Quick Portrait (72×128), Core Frame (128×128), Epic Frame (512×288)
 5. WHEN creating a frame THEN the system SHALL default to Core Frame (128×128) size selection
 6. WHEN creating a frame THEN the system SHALL allow setting permissions: open, approval-required, or owner-only
@@ -62,7 +62,7 @@ Gen Art Pixels is a collaborative digital canvas platform where users create, sh
 
 #### Acceptance Criteria
 
-1. WHEN a user clicks on any pixel location THEN the system SHALL display a color palette with 16 color options including transparent
+1. WHEN a user clicks on any pixel location THEN the system SHALL display a color palette with 32 color options including transparent
 2. WHEN a user selects a color and confirms placement THEN the system SHALL check available pixel quota only if the pixel state will change
 3. IF the user has available quota AND the pixel state will change THEN the system SHALL place the pixel and decrement the quota by 1
 4. IF the user has no available quota THEN the system SHALL display quota exhausted message with refill time
