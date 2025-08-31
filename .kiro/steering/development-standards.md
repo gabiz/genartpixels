@@ -33,6 +33,16 @@ src/
 
 ## Testing Requirements
 
+### Running tests
+
+Do not use --run parameter like this:
+
+npm test -- src/app/api/frames/__tests__/route.test.ts --run
+
+Use instead:
+
+npm test -- src/app/api/frames/__tests__/route.test.ts
+
 ### Test Coverage Expectations
 - **Unit Tests**: All utility functions, validation logic, data transformations
 - **Component Tests**: All React components with user interactions

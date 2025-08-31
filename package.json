@@ -16,6 +16,8 @@
     "supabase:gen-types": "supabase gen types typescript --local > src/lib/supabase/database.types.ts"
   },
   "dependencies": {
+    "@supabase/auth-helpers-nextjs": "^0.10.0",
+    "@supabase/ssr": "^0.7.0",
     "@supabase/supabase-js": "^2.56.1",
     "next": "15.5.2",
     "react": "19.1.0",

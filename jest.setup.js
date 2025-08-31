@@ -1,5 +1,60 @@
 import '@testing-library/jest-dom'
 
+// Mock Next.js server environment
+Object.defineProperty(global, 'Request', {
+  value: class MockRequest {
+    constructor(input, init) {
+      this.url = input
+      this.method = init?.method || 'GET'
+      this.headers = new Map()
+    }
+    
+    async json() {
+      return {}
+    }
+  }
+})
+
+Object.defineProperty(global, 'Response', {
+  value: class MockResponse {
+    constructor(body, init) {
+      this.body = body
+      this.status = init?.status || 200
+      this.headers = new Map()
+    }
+    
+    async json() {
+      return typeof this.body === 'string' ? JSON.parse(this.body) : this.body
+    }
+    
+    static json(data, init) {
+      return new MockResponse(JSON.stringify(data), init)
+    }
+  }
+})
+
+// Mock NextResponse
+jest.mock('next/server', () => ({
+  NextRequest: class MockNextRequest {
+    constructor(input, init) {
+      this.url = input
+      this.method = init?.method || 'GET'
+      this.headers = new Map()
+    }
+    
+    async json() {
+      return {}
+    }
+  },
+  NextResponse: {
+    json: (data, init) => ({
+      json: async () => data,
+      status: init?.status || 200,
+      headers: new Map()
+    })
+  }
+}))
+
 // Mock Supabase client
 jest.mock('@/lib/supabase/client', () => ({
   supabase: {

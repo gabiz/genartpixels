@@ -37,7 +37,7 @@
   - Create authentication test page to verify login/logout and handle creation flow
   - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5, 2.6_
 
-- [ ] 5. Create frame management API routes
+- [x] 5. Create frame management API routes
   - Implement POST /api/frames for frame creation with validation
   - Implement GET /api/frames for frame listing with search and pagination
   - Implement GET /api/frames/[userHandle]/[frameHandle] for individual frame loading
