@@ -117,13 +117,11 @@
   - Integrate Canvas component with pixel editing to create complete editing experience
   - _Requirements: 4.1, 4.2, 4.3, 4.4, 4.5, 4.6, 4.8_
 
-- [ ] 13. Add social features and engagement
+- [x] 13. Add social features and engagement
   - Implement like/unlike functionality for frames
   - Create reporting system for offensive content
   - Build contributor attribution display (click pixel to see contributor)
   - Add frame statistics display and leaderboard components
-  - Write unit tests for like/unlike logic and reporting functionality
-  - Write component tests for social interaction components
   - Integrate social features with existing frame viewer and dashboard
   - _Requirements: 5.1, 5.2, 5.3, 5.4, 5.5, 5.6, 1.5, 1.6_
 
@@ -132,8 +130,6 @@
   - Implement responsive layout that works on mobile and desktop
   - Add touch-optimized controls for mobile pixel placement
   - Create frame sharing functionality with public URLs
-  - Write component tests for responsive behavior and touch interactions
-  - Write end-to-end tests for complete frame viewing and editing workflow
   - Integrate all previous components to create complete frame viewer experience
   - _Requirements: 1.7, 3.8, 8.1, 8.2, 8.3, 8.4, 8.5_
 
@@ -148,7 +144,6 @@
   - _Requirements: 2.2, 2.3, 2.4, 2.5, 2.6_
 
 - [ ] 16. Add comprehensive error handling and validation
-  - Implement client-side validation for all forms and inputs
   - Add proper error boundaries and fallback UI components
   - Create user-friendly error messages and loading states
   - Implement offline detection and appropriate user feedback
@@ -168,7 +163,12 @@
   - _Requirements: 7.1, 7.2, 7.3, 7.4, 7.5_
 
 - [ ] 18. Complete end-to-end testing and quality assurance
-  - Expand end-to-end test coverage for all critical user journeys
+  - Write unit tests for like/unlike logic and reporting functionality
+  - Write component tests for social interaction components
+  - Implement client-side validation for all forms and inputs
+  - Write component tests for responsive behavior and touch interactions
+  - Write end-to-end tests for complete frame viewing and editing workflow
+   - Expand end-to-end test coverage for all critical user journeys
   - Add cross-browser compatibility tests for Canvas and real-time features
   - Implement accessibility testing and compliance verification
   - Create automated testing pipeline and continuous integration setup

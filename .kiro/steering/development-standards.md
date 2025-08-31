@@ -43,6 +43,12 @@ Use instead:
 
 npm test -- src/app/api/frames/__tests__/route.test.ts
 
+Do not use testPathPattern, use testPathPatters instead.
+Option "testPathPattern" was replaced by "--testPathPatterns".
+For example: 
+
+npm test -- --testPathPatterns="like"
+
 ### Test Coverage Expectations
 - **Unit Tests**: All utility functions, validation logic, data transformations
 - **Component Tests**: All React components with user interactions

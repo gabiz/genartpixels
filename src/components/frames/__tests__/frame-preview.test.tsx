@@ -1,6 +1,7 @@
 import { render, screen, fireEvent } from '@testing-library/react'
 import { FramePreview } from '../frame-preview'
 import { FrameWithStats } from '@/lib/types'
+import { useAuth } from '@/lib/auth/context'
 
 // Mock Next.js Link component
 jest.mock('next/link', () => {
@@ -8,6 +9,13 @@ jest.mock('next/link', () => {
     return <a href={href} {...props}>{children}</a>
   }
 })
+
+// Mock the auth context
+jest.mock('@/lib/auth/context')
+const mockUseAuth = useAuth as jest.MockedFunction<typeof useAuth>
+
+// Mock fetch
+global.fetch = jest.fn()
 
 const mockFrame: FrameWithStats = {
   id: '1',
@@ -33,6 +41,20 @@ const mockFrame: FrameWithStats = {
 }
 
 describe('FramePreview', () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+    ;(fetch as jest.Mock).mockClear()
+    
+    // Mock auth context with default values
+    mockUseAuth.mockReturnValue({
+      user: null,
+      loading: false,
+      signIn: jest.fn(),
+      signOut: jest.fn(),
+      createHandle: jest.fn()
+    })
+  })
+
   test('renders frame information correctly', () => {
     render(<FramePreview frame={mockFrame} />)
     

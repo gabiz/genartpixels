@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { FrameWithStats } from '@/lib/types'
+import { LikeButton } from './like-button'
 
 interface FramePreviewProps {
   frame: FrameWithStats
@@ -73,12 +74,14 @@ export function FramePreview({ frame, className = '' }: FramePreviewProps) {
             <h3 className="font-semibold text-gray-900 dark:text-gray-100 truncate flex-1 mr-2">
               {frame.title}
             </h3>
-            <div className="flex items-center text-gray-500 dark:text-gray-400 text-sm">
-              <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clipRule="evenodd" />
-              </svg>
-              {formatNumber(frame.stats.likes_count)}
-            </div>
+            <LikeButton
+              frameOwnerHandle={frame.owner_handle}
+              frameHandle={frame.handle}
+              initialLiked={false} // We'd need to fetch this from API if user is logged in
+              initialLikesCount={frame.stats.likes_count}
+              size="sm"
+              className="text-gray-500 dark:text-gray-400"
+            />
           </div>
 
           <p className="text-sm text-gray-600 dark:text-gray-400 mb-3 line-clamp-2">
