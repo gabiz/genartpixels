@@ -9,7 +9,20 @@ import React, { useState, useCallback } from 'react'
 import { useAuth } from '@/lib/auth/context'
 import { FRAME_SIZES, type FrameSize, type CreateFrameRequest, type FrameWithStats } from '@/lib/types'
 import { validateFrameHandle, validateFrameTitle, validateFrameDescription, validateFrameKeywords } from '@/lib/validation'
-import { LoadingSpinner } from '@/components/ui/loading-spinner'
+import { 
+  Dialog, 
+  DialogContent, 
+  DialogHeader, 
+  DialogTitle, 
+  DialogDescription, 
+  DialogBody,
+  DialogFooter,
+  DialogClose 
+} from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
+import { Alert, AlertDescription, AlertCircleIcon } from '@/components/ui/alert'
 
 interface FrameCreationDialogProps {
   isOpen: boolean
@@ -153,128 +166,79 @@ export function FrameCreationDialog({ isOpen, onClose, onFrameCreated }: FrameCr
     }
   }, [errors])
 
-  if (!isOpen) return null
-
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-        <div className="p-6">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-bold text-gray-900">Create New Frame</h2>
-            <button
-              onClick={onClose}
-              className="text-gray-400 hover:text-gray-600 text-2xl"
-              disabled={isSubmitting}
-            >
-              ×
-            </button>
-          </div>
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="max-w-2xl">
+        <DialogHeader>
+          <DialogTitle>Create New Frame</DialogTitle>
+          <DialogDescription>
+            Set up your collaborative pixel art canvas with custom settings and permissions.
+          </DialogDescription>
+        </DialogHeader>
+        <DialogClose onClose={onClose} />
 
+        <DialogBody>
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Frame Handle */}
-            <div>
-              <label htmlFor="handle" className="block text-sm font-medium text-gray-700 mb-2">
-                Frame Handle *
-              </label>
-              <input
-                type="text"
-                id="handle"
-                value={formData.handle}
-                onChange={(e) => handleInputChange('handle', e.target.value)}
-                className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                  errors.handle ? 'border-red-500' : 'border-gray-300'
-                }`}
-                placeholder="my-awesome-frame"
-                disabled={isSubmitting}
-              />
-              {errors.handle && (
-                <p className="mt-1 text-sm text-red-600">{errors.handle}</p>
-              )}
-              <p className="mt-1 text-sm text-gray-500">
-                3-100 characters, alphanumeric, underscore, and dash only
-              </p>
-            </div>
+            <Input
+              label="Frame Handle *"
+              id="handle"
+              value={formData.handle}
+              onChange={(e) => handleInputChange('handle', e.target.value)}
+              placeholder="my-awesome-frame"
+              disabled={isSubmitting}
+              error={!!errors.handle}
+              helperText={errors.handle || "3-100 characters, alphanumeric, underscore, and dash only"}
+            />
 
             {/* Frame Title */}
-            <div>
-              <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-2">
-                Title *
-              </label>
-              <input
-                type="text"
-                id="title"
-                value={formData.title}
-                onChange={(e) => handleInputChange('title', e.target.value)}
-                className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                  errors.title ? 'border-red-500' : 'border-gray-300'
-                }`}
-                placeholder="My Awesome Collaborative Art"
-                disabled={isSubmitting}
-              />
-              {errors.title && (
-                <p className="mt-1 text-sm text-red-600">{errors.title}</p>
-              )}
-            </div>
+            <Input
+              label="Title *"
+              id="title"
+              value={formData.title}
+              onChange={(e) => handleInputChange('title', e.target.value)}
+              placeholder="My Awesome Collaborative Art"
+              disabled={isSubmitting}
+              error={!!errors.title}
+              helperText={errors.title}
+            />
 
             {/* Description */}
-            <div>
-              <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-2">
-                Description
-              </label>
-              <textarea
-                id="description"
-                value={formData.description}
-                onChange={(e) => handleInputChange('description', e.target.value)}
-                rows={3}
-                className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                  errors.description ? 'border-red-500' : 'border-gray-300'
-                }`}
-                placeholder="Describe your frame's purpose and vision..."
-                disabled={isSubmitting}
-              />
-              {errors.description && (
-                <p className="mt-1 text-sm text-red-600">{errors.description}</p>
-              )}
-              <p className="mt-1 text-sm text-gray-500">
-                Optional, up to 1000 characters
-              </p>
-            </div>
+            <Textarea
+              label="Description"
+              id="description"
+              value={formData.description}
+              onChange={(e) => handleInputChange('description', e.target.value)}
+              rows={3}
+              placeholder="Describe your frame's purpose and vision..."
+              disabled={isSubmitting}
+              error={!!errors.description}
+              helperText={errors.description || "Optional, up to 1000 characters"}
+            />
 
             {/* Keywords */}
-            <div>
-              <label htmlFor="keywords" className="block text-sm font-medium text-gray-700 mb-2">
-                Keywords
-              </label>
-              <input
-                type="text"
-                id="keywords"
-                value={formData.keywords}
-                onChange={(e) => handleInputChange('keywords', e.target.value)}
-                className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                  errors.keywords ? 'border-red-500' : 'border-gray-300'
-                }`}
-                placeholder="art, collaboration, community, pixel"
-                disabled={isSubmitting}
-              />
-              {errors.keywords && (
-                <p className="mt-1 text-sm text-red-600">{errors.keywords}</p>
-              )}
-              <p className="mt-1 text-sm text-gray-500">
-                Comma-separated, up to 10 keywords for discoverability
-              </p>
-            </div>
+            <Input
+              label="Keywords"
+              id="keywords"
+              value={formData.keywords}
+              onChange={(e) => handleInputChange('keywords', e.target.value)}
+              placeholder="art, collaboration, community, pixel"
+              disabled={isSubmitting}
+              error={!!errors.keywords}
+              helperText={errors.keywords || "Comma-separated, up to 10 keywords for discoverability"}
+            />
 
             {/* Frame Size */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-3">
+            <div className="space-y-3">
+              <label className="text-sm font-medium leading-none">
                 Frame Size *
               </label>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {Object.entries(FRAME_SIZES).map(([key, size]) => (
                   <label
                     key={key}
-                    className={`relative flex items-center p-4 border rounded-lg cursor-pointer hover:bg-gray-50 ${
-                      formData.size === key ? 'border-blue-500 bg-blue-50' : 'border-gray-300'
+                    className={`relative flex items-center p-4 border rounded-lg cursor-pointer transition-all hover:bg-accent ${
+                      formData.size === key ? 'border-primary bg-primary/5 ring-2 ring-primary/20' : 'border-border'
                     }`}
                   >
                     <input
@@ -287,14 +251,14 @@ export function FrameCreationDialog({ isOpen, onClose, onFrameCreated }: FrameCr
                       disabled={isSubmitting}
                     />
                     <div className="flex-1">
-                      <div className="font-medium text-gray-900">{size.name}</div>
-                      <div className="text-sm text-gray-500">
+                      <div className="font-medium">{size.name}</div>
+                      <div className="text-sm text-muted-foreground">
                         {size.width} × {size.height} - {size.description}
                       </div>
                     </div>
                     {formData.size === key && (
-                      <div className="text-blue-500">
-                        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                      <div className="text-primary">
+                        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
                           <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                         </svg>
                       </div>
@@ -305,13 +269,13 @@ export function FrameCreationDialog({ isOpen, onClose, onFrameCreated }: FrameCr
             </div>
 
             {/* Permissions */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-3">
+            <div className="space-y-3">
+              <label className="text-sm font-medium leading-none">
                 Permissions *
               </label>
               <div className="space-y-3">
-                <label className={`flex items-center p-3 border rounded-lg cursor-pointer hover:bg-gray-50 ${
-                  formData.permissions === 'open' ? 'border-blue-500 bg-blue-50' : 'border-gray-300'
+                <label className={`flex items-center p-4 border rounded-lg cursor-pointer transition-all hover:bg-accent ${
+                  formData.permissions === 'open' ? 'border-primary bg-primary/5 ring-2 ring-primary/20' : 'border-border'
                 }`}>
                   <input
                     type="radio"
@@ -319,17 +283,17 @@ export function FrameCreationDialog({ isOpen, onClose, onFrameCreated }: FrameCr
                     value="open"
                     checked={formData.permissions === 'open'}
                     onChange={(e) => handleInputChange('permissions', e.target.value)}
-                    className="mr-3"
+                    className="mr-3 h-4 w-4 text-primary focus:ring-primary"
                     disabled={isSubmitting}
                   />
                   <div>
-                    <div className="font-medium text-gray-900">Open</div>
-                    <div className="text-sm text-gray-500">Anyone can contribute pixels</div>
+                    <div className="font-medium">Open</div>
+                    <div className="text-sm text-muted-foreground">Anyone can contribute pixels</div>
                   </div>
                 </label>
 
-                <label className={`flex items-center p-3 border rounded-lg cursor-pointer hover:bg-gray-50 ${
-                  formData.permissions === 'approval-required' ? 'border-blue-500 bg-blue-50' : 'border-gray-300'
+                <label className={`flex items-center p-4 border rounded-lg cursor-pointer transition-all hover:bg-accent ${
+                  formData.permissions === 'approval-required' ? 'border-primary bg-primary/5 ring-2 ring-primary/20' : 'border-border'
                 }`}>
                   <input
                     type="radio"
@@ -337,17 +301,17 @@ export function FrameCreationDialog({ isOpen, onClose, onFrameCreated }: FrameCr
                     value="approval-required"
                     checked={formData.permissions === 'approval-required'}
                     onChange={(e) => handleInputChange('permissions', e.target.value)}
-                    className="mr-3"
+                    className="mr-3 h-4 w-4 text-primary focus:ring-primary"
                     disabled={isSubmitting}
                   />
                   <div>
-                    <div className="font-medium text-gray-900">Approval Required</div>
-                    <div className="text-sm text-gray-500">Contributors must be approved by you</div>
+                    <div className="font-medium">Approval Required</div>
+                    <div className="text-sm text-muted-foreground">Contributors must be approved by you</div>
                   </div>
                 </label>
 
-                <label className={`flex items-center p-3 border rounded-lg cursor-pointer hover:bg-gray-50 ${
-                  formData.permissions === 'owner-only' ? 'border-blue-500 bg-blue-50' : 'border-gray-300'
+                <label className={`flex items-center p-4 border rounded-lg cursor-pointer transition-all hover:bg-accent ${
+                  formData.permissions === 'owner-only' ? 'border-primary bg-primary/5 ring-2 ring-primary/20' : 'border-border'
                 }`}>
                   <input
                     type="radio"
@@ -355,12 +319,12 @@ export function FrameCreationDialog({ isOpen, onClose, onFrameCreated }: FrameCr
                     value="owner-only"
                     checked={formData.permissions === 'owner-only'}
                     onChange={(e) => handleInputChange('permissions', e.target.value)}
-                    className="mr-3"
+                    className="mr-3 h-4 w-4 text-primary focus:ring-primary"
                     disabled={isSubmitting}
                   />
                   <div>
-                    <div className="font-medium text-gray-900">Owner Only</div>
-                    <div className="text-sm text-gray-500">Only you can add pixels</div>
+                    <div className="font-medium">Owner Only</div>
+                    <div className="text-sm text-muted-foreground">Only you can add pixels</div>
                   </div>
                 </label>
               </div>
@@ -368,33 +332,33 @@ export function FrameCreationDialog({ isOpen, onClose, onFrameCreated }: FrameCr
 
             {/* General Error */}
             {errors.general && (
-              <div className="p-3 bg-red-50 border border-red-200 rounded-md">
-                <p className="text-sm text-red-600">{errors.general}</p>
-              </div>
+              <Alert variant="destructive">
+                <AlertCircleIcon />
+                <AlertDescription>{errors.general}</AlertDescription>
+              </Alert>
             )}
-
-            {/* Submit Buttons */}
-            <div className="flex justify-end space-x-3 pt-4 border-t">
-              <button
-                type="button"
-                onClick={onClose}
-                className="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors"
-                disabled={isSubmitting}
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
-                disabled={isSubmitting}
-              >
-                {isSubmitting && <LoadingSpinner size="sm" className="mr-2" />}
-                {isSubmitting ? 'Creating...' : 'Create Frame'}
-              </button>
-            </div>
           </form>
-        </div>
-      </div>
-    </div>
+        </DialogBody>
+
+        <DialogFooter>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onClose}
+            disabled={isSubmitting}
+          >
+            Cancel
+          </Button>
+          <Button
+            type="submit"
+            loading={isSubmitting}
+            disabled={isSubmitting}
+            onClick={handleSubmit}
+          >
+            {isSubmitting ? 'Creating...' : 'Create Frame'}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   )
 }

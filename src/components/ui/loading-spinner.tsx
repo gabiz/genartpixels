@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * Loading spinner component
+ * Loading spinner component with consistent design system styling
  */
 
 import React from 'react'
@@ -13,16 +13,24 @@ interface LoadingSpinnerProps {
 
 export function LoadingSpinner({ size = 'md', className = '' }: LoadingSpinnerProps) {
   const sizeClasses = {
-    sm: 'w-4 h-4',
-    md: 'w-8 h-8',
-    lg: 'w-12 h-12',
+    sm: 'w-4 h-4 border-2',
+    md: 'w-6 h-6 border-2',
+    lg: 'w-8 h-8 border-[3px]',
   }
 
+  const classes = [
+    sizeClasses[size],
+    'border-muted-foreground/30 border-t-primary rounded-full animate-spin',
+    className
+  ].join(' ')
+
   return (
-    <div className={`flex items-center justify-center ${className}`}>
-      <div
-        className={`${sizeClasses[size]} border-2 border-gray-300 border-t-blue-600 rounded-full animate-spin`}
-      />
+    <div 
+      className={classes}
+      role="status"
+      aria-label="Loading"
+    >
+      <span className="sr-only">Loading...</span>
     </div>
   )
 }

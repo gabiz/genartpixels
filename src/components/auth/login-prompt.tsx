@@ -2,11 +2,14 @@
 
 /**
  * Login prompt component for unauthenticated users
- * Provides SSO login options
+ * Provides SSO login options with improved accessibility and design
  */
 
 import React from 'react'
 import { useAuth } from '@/lib/auth/context'
+import { Button } from '@/components/ui/button'
+import { Alert, AlertDescription, AlertCircleIcon } from '@/components/ui/alert'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 
 export function LoginPrompt() {
   const { signIn } = useAuth()
@@ -29,70 +32,95 @@ export function LoginPrompt() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="max-w-md w-full space-y-8 p-8">
-        <div className="text-center">
-          <h2 className="text-3xl font-bold text-gray-900">
-            Welcome to Gen Art Pixels
-          </h2>
-          <p className="mt-2 text-gray-600">
-            Sign in to start creating collaborative pixel art
-          </p>
-        </div>
-
-        <div className="space-y-4">
-          <button
-            onClick={() => handleSignIn('google')}
-            disabled={loading !== null}
-            className="w-full flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {loading === 'google' ? (
-              <div className="w-5 h-5 border-2 border-gray-300 border-t-gray-600 rounded-full animate-spin mr-2" />
-            ) : (
-              <GoogleIcon className="w-5 h-5 mr-2" />
-            )}
-            Continue with Google
-          </button>
-
-          <button
-            onClick={() => handleSignIn('github')}
-            disabled={loading !== null}
-            className="w-full flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {loading === 'github' ? (
-              <div className="w-5 h-5 border-2 border-gray-300 border-t-gray-600 rounded-full animate-spin mr-2" />
-            ) : (
-              <GitHubIcon className="w-5 h-5 mr-2" />
-            )}
-            Continue with GitHub
-          </button>
-
-          <button
-            onClick={() => handleSignIn('facebook')}
-            disabled={loading !== null}
-            className="w-full flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {loading === 'facebook' ? (
-              <div className="w-5 h-5 border-2 border-gray-300 border-t-gray-600 rounded-full animate-spin mr-2" />
-            ) : (
-              <FacebookIcon className="w-5 h-5 mr-2" />
-            )}
-            Continue with Facebook
-          </button>
-        </div>
-
-        {error && (
-          <div className="text-red-600 text-sm text-center">
-            {error}
+    <div className="min-h-screen flex items-center justify-center bg-muted/30 p-4">
+      <Card className="w-full max-w-md animate-fade-in">
+        <CardHeader className="text-center space-y-4">
+          <div className="mx-auto w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center">
+            <svg 
+              className="w-8 h-8 text-primary" 
+              fill="none" 
+              stroke="currentColor" 
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+            >
+              <path 
+                strokeLinecap="round" 
+                strokeLinejoin="round" 
+                strokeWidth={2} 
+                d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zM21 5a2 2 0 00-2-2h-4a2 2 0 00-2 2v12a4 4 0 004 4h4a2 2 0 002-2V5z" 
+              />
+            </svg>
           </div>
-        )}
+          <CardTitle className="text-2xl">Welcome to Gen Art Pixels</CardTitle>
+          <CardDescription>
+            Sign in to start creating collaborative pixel art and join our creative community
+          </CardDescription>
+        </CardHeader>
 
-        <div className="text-center text-sm text-gray-500">
-          <p>
-            By signing in, you agree to our terms of service and privacy policy.
-          </p>
-        </div>
-      </div>
+        <CardContent className="space-y-6">
+          <div className="space-y-3">
+            <Button
+              onClick={() => handleSignIn('google')}
+              disabled={loading !== null}
+              loading={loading === 'google'}
+              variant="outline"
+              className="w-full justify-start"
+            >
+              <GoogleIcon className="w-5 h-5 mr-3" />
+              Continue with Google
+            </Button>
+
+            <Button
+              onClick={() => handleSignIn('github')}
+              disabled={loading !== null}
+              loading={loading === 'github'}
+              variant="outline"
+              className="w-full justify-start"
+            >
+              <GitHubIcon className="w-5 h-5 mr-3" />
+              Continue with GitHub
+            </Button>
+
+            <Button
+              onClick={() => handleSignIn('facebook')}
+              disabled={loading !== null}
+              loading={loading === 'facebook'}
+              variant="outline"
+              className="w-full justify-start"
+            >
+              <FacebookIcon className="w-5 h-5 mr-3" />
+              Continue with Facebook
+            </Button>
+          </div>
+
+          {error && (
+            <Alert variant="destructive">
+              <AlertCircleIcon />
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
+
+          <div className="text-center">
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              By signing in, you agree to our{' '}
+              <a 
+                href="/terms" 
+                className="underline underline-offset-4 hover:text-primary transition-colors"
+              >
+                terms of service
+              </a>{' '}
+              and{' '}
+              <a 
+                href="/privacy" 
+                className="underline underline-offset-4 hover:text-primary transition-colors"
+              >
+                privacy policy
+              </a>
+              .
+            </p>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   )
 }
