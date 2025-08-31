@@ -97,7 +97,7 @@
   - Integrate with previous components to create functional dashboard page
   - _Requirements: 1.1, 5.7, 5.8, 8.1, 8.2, 8.3_
 
-- [ ] 11. Create frame creation and management UI
+- [x] 11. Create frame creation and management UI
   - Build frame creation dialog with size selection and metadata inputs
   - Implement frame settings panel for owners (permissions, freeze/unfreeze)
   - Create contributor management interface for approval-required frames
