@@ -1,3 +1,7 @@
 export { FrameCanvas, type FrameCanvasProps, type FrameCanvasRef, type CanvasViewport, type CanvasInteraction } from './frame-canvas'
 export { CanvasControls, type CanvasControlsProps } from './canvas-controls'
 export { CanvasContainer, type CanvasContainerProps } from './canvas-container'
+export { ColorPalette, type ColorPaletteProps } from './color-palette'
+export { QuotaDisplay, type QuotaDisplayProps } from './quota-display'
+export { PixelFeedbackDisplay, usePixelFeedback, type PixelFeedbackProps, type PixelFeedback, type FeedbackType } from './pixel-feedback'
+export { PixelEditor, type PixelEditorProps, type PixelEditorState } from './pixel-editor'
