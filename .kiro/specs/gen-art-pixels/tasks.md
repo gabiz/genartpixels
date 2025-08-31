@@ -77,7 +77,7 @@
   - Create Canvas test page to verify rendering, zoom/pan, and pixel coordinate mapping
   - _Requirements: 1.2, 1.3, 8.7, 8.1, 8.2, 8.4_
 
-- [ ] 9. Implement real-time collaboration
+- [x] 9. Implement real-time collaboration
   - Set up Supabase Realtime subscriptions for frame-specific channels
   - Implement real-time pixel broadcasting and receiving
   - Add support for frame event types (freeze, title updates, permissions)
