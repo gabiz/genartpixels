@@ -12,6 +12,31 @@ export default function TestPage() {
       <div className="max-w-4xl mx-auto space-y-8">
         <h1 className="text-3xl font-bold">Gen Art Pixels - Foundation Test</h1>
         
+        {/* Navigation Links */}
+        <section>
+          <h2 className="text-2xl font-semibold mb-4">Test Pages</h2>
+          <div className="flex flex-wrap gap-4">
+            <a 
+              href="/test/auth" 
+              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+            >
+              Authentication Test
+            </a>
+            <a 
+              href="/test/frames" 
+              className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+            >
+              Frames Test
+            </a>
+            <a 
+              href="/test/pixels" 
+              className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700"
+            >
+              Pixel Placement Test
+            </a>
+          </div>
+        </section>
+        
         {/* Color Palette Test */}
         <section>
           <h2 className="text-2xl font-semibold mb-4">Color Palette ({COLOR_PALETTE.length} colors)</h2>
