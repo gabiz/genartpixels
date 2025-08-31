@@ -9,7 +9,7 @@
   - Write unit tests for initial utility functions
   - _Requirements: 2.1, 8.1, 8.2, 8.3_
 
-- [ ] 2. Implement core data models and utilities
+- [x] 2. Implement core data models and utilities
   - Create TypeScript interfaces for User, Frame, Pixel, and FramePermission models
   - Implement color utility functions for ARGB conversion and 32-color palette
   - Create validation functions for handles, coordinates, and color values
