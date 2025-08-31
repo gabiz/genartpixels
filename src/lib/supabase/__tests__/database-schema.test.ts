@@ -12,16 +12,31 @@ const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS
 
 const supabase = createClient<Database>(supabaseUrl, supabaseKey);
 
-describe('Database Schema Integration Tests', () => {
+// Check if Supabase is available for testing
+const isSupabaseAvailable = () => {
+  try {
+    return supabaseUrl && supabaseKey && supabaseUrl.includes('127.0.0.1')
+  } catch {
+    return false
+  }
+}
+
+const describeOrSkip = isSupabaseAvailable() ? describe : describe.skip
+
+describeOrSkip('Database Schema Integration Tests', () => {
   beforeEach(async () => {
     // Clean up test data before each test
-    await supabase.from('frame_likes').delete().neq('id', '00000000-0000-0000-0000-000000000000');
-    await supabase.from('pixels').delete().neq('id', '00000000-0000-0000-0000-000000000000');
-    await supabase.from('frame_permissions').delete().neq('id', '00000000-0000-0000-0000-000000000000');
-    await supabase.from('frame_snapshots').delete().neq('id', '00000000-0000-0000-0000-000000000000');
-    await supabase.from('frame_stats').delete().neq('frame_id', '00000000-0000-0000-0000-000000000000');
-    await supabase.from('frames').delete().neq('id', '00000000-0000-0000-0000-000000000000');
-    await supabase.from('users').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+    try {
+      await supabase.from('frame_likes').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+      await supabase.from('pixels').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+      await supabase.from('frame_permissions').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+      await supabase.from('frame_snapshots').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+      await supabase.from('frame_stats').delete().neq('frame_id', '00000000-0000-0000-0000-000000000000');
+      await supabase.from('frames').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+      await supabase.from('users').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+    } catch (error) {
+      console.warn('Failed to clean up test data:', error)
+    }
   });
 
   describe('Users Table', () => {

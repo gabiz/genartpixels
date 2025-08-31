@@ -4,7 +4,7 @@
 
 import { useEffect, useRef, useCallback, useState } from 'react'
 import { FrameEvent, Pixel } from '@/lib/types'
-import { realtimeManager, ConnectionState } from './manager'
+import { getRealtimeManager, ConnectionState } from './manager'
 
 /**
  * Hook for subscribing to real-time frame events
@@ -20,19 +20,29 @@ export function useFrameRealtime(frameId: string | null) {
   }, [])
 
   const subscribe = useCallback((callback?: (event: FrameEvent) => void) => {
-    if (!frameId) return
+    if (!frameId || typeof window === 'undefined') return
 
-    callbackRef.current = callback || null
-    realtimeManager.subscribeToFrame(frameId, handleEvent)
-    setIsSubscribed(true)
+    try {
+      callbackRef.current = callback || null
+      const manager = getRealtimeManager()
+      manager.subscribeToFrame(frameId, handleEvent)
+      setIsSubscribed(true)
+    } catch (error) {
+      console.error('Failed to subscribe to realtime:', error)
+    }
   }, [frameId, handleEvent])
 
   const unsubscribe = useCallback(() => {
-    if (!frameId) return
+    if (!frameId || typeof window === 'undefined') return
 
-    realtimeManager.unsubscribeFromFrame(frameId)
-    setIsSubscribed(false)
-    callbackRef.current = null
+    try {
+      const manager = getRealtimeManager()
+      manager.unsubscribeFromFrame(frameId)
+      setIsSubscribed(false)
+      callbackRef.current = null
+    } catch (error) {
+      console.error('Failed to unsubscribe from realtime:', error)
+    }
   }, [frameId])
 
   const clearEvents = useCallback(() => {
@@ -58,17 +68,34 @@ export function useFrameRealtime(frameId: string | null) {
  * Hook for monitoring connection state
  */
 export function useRealtimeConnection() {
-  const [connectionState, setConnectionState] = useState<ConnectionState>(
-    realtimeManager.getConnectionState()
-  )
+  const [connectionState, setConnectionState] = useState<ConnectionState>({
+    isConnected: false,
+    isReconnecting: false,
+    reconnectAttempts: 0
+  })
 
   useEffect(() => {
-    const unsubscribe = realtimeManager.onConnectionStateChange(setConnectionState)
-    return unsubscribe
+    if (typeof window === 'undefined') return
+
+    try {
+      const manager = getRealtimeManager()
+      setConnectionState(manager.getConnectionState())
+      const unsubscribe = manager.onConnectionStateChange(setConnectionState)
+      return unsubscribe
+    } catch (error) {
+      console.error('Failed to initialize realtime connection:', error)
+    }
   }, [])
 
   const reconnect = useCallback(() => {
-    realtimeManager.reconnect()
+    if (typeof window === 'undefined') return
+
+    try {
+      const manager = getRealtimeManager()
+      manager.reconnect()
+    } catch (error) {
+      console.error('Failed to reconnect:', error)
+    }
   }, [])
 
   return {
@@ -85,11 +112,14 @@ export function useFrameBroadcast() {
   const [lastError, setLastError] = useState<Error | null>(null)
 
   const broadcast = useCallback(async (event: FrameEvent) => {
+    if (typeof window === 'undefined') return
+
     setIsBroadcasting(true)
     setLastError(null)
 
     try {
-      const response = await realtimeManager.broadcastFrameEvent(event)
+      const manager = getRealtimeManager()
+      const response = await manager.broadcastFrameEvent(event)
       
       if (response.status !== 'ok') {
         throw new Error(`Broadcast failed with status: ${response.status}`)

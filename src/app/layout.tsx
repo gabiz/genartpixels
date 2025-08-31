@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/lib/auth/context";
 import { HandleRequired } from "@/components/auth/handle-required";
+import { AuthRedirectHandler } from "@/components/auth/auth-redirect-handler";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -60,6 +61,7 @@ export default function RootLayout({
         </a>
         
         <AuthProvider>
+          <AuthRedirectHandler />
           <HandleRequired>
             <div id="root" className="relative flex min-h-screen flex-col">
               <main id="main-content" className="flex-1">

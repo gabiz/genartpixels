@@ -13,21 +13,40 @@ import {
 } from '../hooks'
 import { FrameEvent, Pixel } from '@/lib/types'
 
-// Mock the realtime manager
-jest.mock('../manager', () => ({
-  realtimeManager: {
+// Mock the getRealtimeManager function
+jest.mock('../manager', () => {
+  const mockManager = {
     subscribeToFrame: jest.fn(),
     unsubscribeFromFrame: jest.fn(),
     broadcastFrameEvent: jest.fn(),
-    getConnectionState: jest.fn(),
+    getConnectionState: jest.fn(() => ({ status: 'connected', lastConnected: new Date() })),
     onConnectionStateChange: jest.fn(),
     reconnect: jest.fn()
   }
+  
+  return {
+    getRealtimeManager: jest.fn(() => mockManager),
+    realtimeManager: mockManager
+  }
+})
+
+// Mock the robust manager as well
+jest.mock('../robust-manager', () => ({
+  getRobustRealtimeManager: jest.fn(() => ({
+    subscribeToFrame: jest.fn(),
+    unsubscribeFromFrame: jest.fn(),
+    broadcastEvent: jest.fn(),
+    getSubscriptionStatus: jest.fn(),
+    destroy: jest.fn()
+  }))
 }))
 
-// Import the mocked manager
-import { realtimeManager } from '../manager'
+// Import the mocked functions
+import { getRealtimeManager, realtimeManager } from '../manager'
+import { getRobustRealtimeManager } from '../robust-manager'
+const mockGetRealtimeManager = getRealtimeManager as jest.MockedFunction<typeof getRealtimeManager>
 const mockRealtimeManager = realtimeManager as jest.Mocked<typeof realtimeManager>
+const mockGetRobustManager = getRobustRealtimeManager as jest.MockedFunction<typeof getRobustRealtimeManager>
 
 describe('useFrameRealtime', () => {
   beforeEach(() => {

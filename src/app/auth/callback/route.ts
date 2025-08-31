@@ -17,7 +17,10 @@ export async function GET(request: NextRequest) {
       
       if (!error) {
         // Successful authentication - redirect to the intended page or home
-        return NextResponse.redirect(`${origin}${next}`)
+        const redirectUrl = new URL(next, origin)
+        // Add a timestamp to force a fresh page load and avoid WebSocket issues
+        redirectUrl.searchParams.set('auth_success', Date.now().toString())
+        return NextResponse.redirect(redirectUrl.toString())
       }
     } catch (error) {
       console.error('Error exchanging code for session:', error)

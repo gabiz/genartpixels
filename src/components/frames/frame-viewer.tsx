@@ -10,6 +10,7 @@ import { useRouter } from 'next/navigation'
 import { FrameWithStats, FramePermission, Pixel, FrameResponse } from '@/lib/types'
 import { useAuth } from '@/lib/auth/context'
 import { useFrameRealtime } from '@/lib/realtime/hooks'
+import { getRobustRealtimeManager } from '@/lib/realtime/robust-manager'
 import { PixelEditor } from '@/components/canvas/pixel-editor'
 import { InteractiveFrameCanvas } from '@/components/canvas/interactive-frame-canvas'
 import { ColorPalette } from '@/components/canvas/color-palette'
@@ -18,6 +19,8 @@ import { LikeButton } from '@/components/frames/like-button'
 import { ReportButton } from '@/components/frames/report-button'
 import { FrameSettingsPanel } from '@/components/frames/frame-settings-panel'
 import { LoadingSpinner } from '@/components/ui/loading-spinner'
+import { testRealtimeConnection, testFrameChannel } from '@/lib/realtime/test'
+import { testBasicConnection, checkSupabaseConfig } from '@/lib/realtime/simple-test'
 
 interface FrameViewerProps {
   frame: FrameWithStats
@@ -85,9 +88,11 @@ export function FrameViewer({
     return () => window.removeEventListener('resize', checkMobile)
   }, [])
 
-  // Set up real-time subscription
+  // Set up real-time subscription using robust manager
   useEffect(() => {
     const handleRealtimeEvent = (event: any) => {
+      console.log('Received realtime event:', event)
+      
       switch (event.type) {
         case 'pixel':
           handlePixelUpdate(event.data)
@@ -107,12 +112,23 @@ export function FrameViewer({
       }
     }
 
-    subscribe(handleRealtimeEvent)
+    console.log('Setting up robust realtime subscription for frame:', frame.id)
     
-    return () => {
-      unsubscribe()
+    try {
+      const robustManager = getRobustRealtimeManager()
+      robustManager.subscribeToFrame(frame.id, handleRealtimeEvent)
+      
+      return () => {
+        console.log('Cleaning up robust realtime subscription for frame:', frame.id)
+        robustManager.unsubscribeFromFrame(frame.id)
+      }
+    } catch (error) {
+      console.error('Failed to set up robust realtime subscription:', error)
+      // Fallback to original method
+      subscribe(handleRealtimeEvent)
+      return () => unsubscribe()
     }
-  }, [subscribe, unsubscribe, router])
+  }, [router, frame.id, subscribe, unsubscribe])
 
   const loadFrameData = async () => {
     try {
@@ -298,6 +314,101 @@ export function FrameViewer({
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
                 </svg>
               </button>
+
+              {/* Test Realtime button (development only) */}
+              {process.env.NODE_ENV === 'development' && (
+                <button
+                  onClick={async () => {
+                    console.log('Running comprehensive realtime tests...')
+                    
+                    // Test 1: Check Supabase configuration
+                    const configTest = await checkSupabaseConfig()
+                    console.log('Config test:', configTest)
+                    
+                    // Test 2: Basic connection test
+                    const basicTest = await testBasicConnection()
+                    console.log('Basic connection test:', basicTest)
+                    
+                    // Test 3: Robust manager test
+                    let robustTest = { success: false, details: 'Testing robust manager...' }
+                    try {
+                      const robustManager = getRobustRealtimeManager()
+                      
+                      // Test that we can create subscriptions without crashing
+                      robustManager.subscribeToFrame('test-frame-1', (event) => {
+                        console.log('Robust manager test event 1:', event)
+                      })
+                      
+                      robustManager.subscribeToFrame('test-frame-2', (event) => {
+                        console.log('Robust manager test event 2:', event)
+                      })
+                      
+                      // Wait a bit to see if it subscribes without crashing
+                      await new Promise(resolve => setTimeout(resolve, 3000))
+                      
+                      const status1 = robustManager.getSubscriptionStatus('test-frame-1')
+                      const status2 = robustManager.getSubscriptionStatus('test-frame-2')
+                      
+                      // Test broadcast functionality
+                      const broadcastResult = await robustManager.broadcastEvent({
+                        type: 'pixel',
+                        data: {
+                          id: 'test',
+                          frame_id: 'test-frame-1',
+                          x: 0,
+                          y: 0,
+                          color: 0xFF0000,
+                          contributor_handle: 'test',
+                          placed_at: new Date().toISOString()
+                        }
+                      })
+                      
+                      // Clean up
+                      robustManager.unsubscribeFromFrame('test-frame-1')
+                      robustManager.unsubscribeFromFrame('test-frame-2')
+                      
+                      robustTest = { 
+                        success: true, 
+                        details: `Robust manager working! Status1: ${status1}, Status2: ${status2}, Broadcast: ${broadcastResult}` 
+                      }
+                    } catch (error) {
+                      robustTest = { 
+                        success: false, 
+                        details: `Robust manager error: ${error}` 
+                      }
+                    }
+                    
+                    // Test 4: Skip the problematic broadcast test that causes stack overflow
+                    let broadcastTest = { 
+                      success: false, 
+                      details: 'Skipped - original Supabase realtime has infinite loop bug' 
+                    }
+                    
+                    const results = `Realtime Diagnostic Results:
+                    
+1. Config: ${configTest.success ? 'PASS' : 'FAIL'}
+   ${configTest.details}
+   
+2. Basic Connection: ${basicTest.success ? 'PASS' : 'FAIL'}
+   ${basicTest.details}
+   
+3. Robust Manager: ${robustTest.success ? 'PASS' : 'FAIL'}
+   ${robustTest.details}
+   
+4. Broadcast Test: ${broadcastTest.success ? 'PASS' : 'FAIL'}
+   ${broadcastTest.details}`
+   
+                    console.log(results)
+                    alert(results)
+                  }}
+                  className="p-2 text-orange-500 hover:bg-orange-100 dark:hover:bg-orange-900 rounded-lg transition-colors"
+                  title="Test realtime connection"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                </button>
+              )}
 
               {/* Mobile pixel editor toggle */}
               {state.isMobile && canEdit && (

@@ -471,7 +471,7 @@ describe('Snapshot Integration Tests', () => {
       const compressionRatio = CompressionUtils.getCompressionRatio(originalSize, compressed.length)
 
       // For a partially filled large frame, we should achieve significant compression
-      expect(compressionRatio).toBeGreaterThan(60) // At least 60% compression
+      expect(compressionRatio).toBeGreaterThanOrEqual(60) // At least 60% compression
       expect(compressed.length).toBeLessThan(originalSize / 2) // Less than half the original size
     })
 

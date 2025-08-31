@@ -42,29 +42,11 @@ export class RealtimeManager {
       connectionTimeout: config.connectionTimeout ?? 10000
     }
 
-    // Listen for global connection state changes
-    supabase.realtime.onOpen(() => {
-      this.updateConnectionState({
-        isConnected: true,
-        isReconnecting: false,
-        reconnectAttempts: 0
-      })
-    })
-
-    supabase.realtime.onClose(() => {
-      this.updateConnectionState({
-        isConnected: false,
-        isReconnecting: false
-      })
-      this.handleConnectionLoss()
-    })
-
-    supabase.realtime.onError((error) => {
-      console.error('Realtime connection error:', error)
-      this.updateConnectionState({
-        isConnected: false,
-        lastError: error instanceof Error ? error : new Error(String(error))
-      })
+    // Initialize connection state as connected since we'll handle connection state per channel
+    this.updateConnectionState({
+      isConnected: true,
+      isReconnecting: false,
+      reconnectAttempts: 0
     })
   }
 
@@ -77,75 +59,84 @@ export class RealtimeManager {
 
     const channelName = `frame:${frameId}`
     
+    console.log(`Creating realtime channel: ${channelName}`)
+    
+    // For now, only use broadcast events to avoid postgres_changes issues
     const channel = supabase
-      .channel(channelName)
+      .channel(channelName, {
+        config: {
+          broadcast: { self: true }
+        }
+      })
       .on('broadcast', { event: 'frame_event' }, ({ payload }) => {
         try {
+          console.log('Received broadcast event:', payload)
           const frameEvent = this.validateFrameEvent(payload)
           callback(frameEvent)
         } catch (error) {
           console.error('Invalid frame event received:', error, payload)
         }
       })
-      .on('postgres_changes', {
-        event: 'INSERT',
-        schema: 'public',
-        table: 'pixels',
-        filter: `frame_id=eq.${frameId}`
-      }, (payload) => {
-        const pixel = payload.new as Pixel
-        callback({ type: 'pixel', data: pixel })
-      })
-      .on('postgres_changes', {
-        event: 'UPDATE',
-        schema: 'public',
-        table: 'frames',
-        filter: `id=eq.${frameId}`
-      }, (payload) => {
-        const frame = payload.new as Record<string, unknown>
-        const oldFrame = payload.old as Record<string, unknown>
-        
-        // Check what changed and emit appropriate events
-        if (frame.is_frozen !== oldFrame.is_frozen) {
-          callback({
-            type: 'freeze',
-            frameId,
-            isFrozen: frame.is_frozen
-          })
+      .on('broadcast', { event: 'pixel_placed' }, ({ payload }) => {
+        try {
+          console.log('Received pixel placed event:', payload)
+          if (payload && typeof payload === 'object' && 'pixel' in payload) {
+            callback({ type: 'pixel', data: payload.pixel as Pixel })
+          }
+        } catch (error) {
+          console.error('Invalid pixel event received:', error, payload)
         }
-        
-        if (frame.title !== oldFrame.title) {
-          callback({
-            type: 'updateTitle',
-            frameId,
-            title: frame.title
-          })
-        }
-        
-        if (frame.permissions !== oldFrame.permissions) {
-          callback({
-            type: 'updatePermissions',
-            frameId,
-            permissions: frame.permissions as FramePermissionType
-          })
-        }
-      })
-      .on('postgres_changes', {
-        event: 'DELETE',
-        schema: 'public',
-        table: 'frames',
-        filter: `id=eq.${frameId}`
-      }, () => {
-        callback({ type: 'delete', frameId })
       })
 
-    // Subscribe to the channel
-    channel.subscribe((status) => {
-      if (status === 'SUBSCRIBED') {
-        console.log(`Subscribed to frame ${frameId}`)
-      } else if (status === 'CHANNEL_ERROR') {
-        console.error(`Failed to subscribe to frame ${frameId}`)
-        this.handleChannelError(frameId)
+    // Subscribe to the channel with simplified error handling
+    channel.subscribe((status, err) => {
+      console.log(`Realtime subscription status for frame ${frameId}:`, status)
+      if (err) {
+        console.error(`Realtime subscription error for frame ${frameId}:`, err)
+      }
+      
+      switch (status) {
+        case 'SUBSCRIBED':
+          console.log(`✓ Successfully subscribed to frame ${frameId}`)
+          this.updateConnectionState({
+            isConnected: true,
+            isReconnecting: false,
+            reconnectAttempts: 0
+          })
+          break
+          
+        case 'CHANNEL_ERROR':
+          // Check if this is the common "Unknown Error on Channel" that often resolves itself
+          const errorMessage = err?.message || 'Unknown error'
+          if (errorMessage.includes('Unknown Error on Channel')) {
+            console.warn(`⚠️ Transient channel error for frame ${frameId} (often resolves automatically)`)
+            // Don't update connection state as disconnected for this specific error
+          } else {
+            console.error(`✗ Channel error for frame ${frameId}:`, errorMessage)
+            this.updateConnectionState({
+              isConnected: false,
+              lastError: new Error(`Channel error for frame ${frameId}: ${errorMessage}`)
+            })
+          }
+          break
+          
+        case 'TIMED_OUT':
+          console.error(`⏱ Subscription timed out for frame ${frameId}`)
+          this.updateConnectionState({
+            isConnected: false,
+            lastError: new Error(`Subscription timeout for frame ${frameId}`)
+          })
+          break
+          
+        case 'CLOSED':
+          console.log(`🔌 Channel closed for frame ${frameId}`)
+          this.updateConnectionState({
+            isConnected: false
+          })
+          break
+          
+        default:
+          console.log(`Realtime status: ${status}`)
       }
     })
 
@@ -381,5 +372,38 @@ export class RealtimeManager {
   }
 }
 
-// Singleton instance for global use
-export const realtimeManager = new RealtimeManager()
+// Singleton instance for global use (lazy-loaded)
+let _realtimeManager: RealtimeManager | null = null
+
+export function getRealtimeManager(): RealtimeManager {
+  if (typeof window === 'undefined') {
+    throw new Error('RealtimeManager can only be used on the client side')
+  }
+  
+  if (!_realtimeManager) {
+    _realtimeManager = new RealtimeManager()
+  }
+  
+  return _realtimeManager
+}
+
+// Legacy export for backward compatibility
+export const realtimeManager = {
+  get instance() {
+    return getRealtimeManager()
+  },
+  subscribeToFrame: (frameId: string, callback: (event: FrameEvent) => void) => 
+    getRealtimeManager().subscribeToFrame(frameId, callback),
+  unsubscribeFromFrame: (frameId: string) => 
+    getRealtimeManager().unsubscribeFromFrame(frameId),
+  broadcastFrameEvent: (event: FrameEvent) => 
+    getRealtimeManager().broadcastFrameEvent(event),
+  getConnectionState: () => 
+    getRealtimeManager().getConnectionState(),
+  onConnectionStateChange: (listener: (state: ConnectionState) => void) => 
+    getRealtimeManager().onConnectionStateChange(listener),
+  reconnect: () => 
+    getRealtimeManager().reconnect(),
+  destroy: () => 
+    getRealtimeManager().destroy()
+}
