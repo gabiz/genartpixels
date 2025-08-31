@@ -14,13 +14,15 @@ export interface ColorPaletteProps {
   onColorSelect: (color: number) => void
   disabled?: boolean
   className?: string
+  isMobile?: boolean
 }
 
 export function ColorPalette({ 
   selectedColor, 
   onColorSelect, 
   disabled = false,
-  className = '' 
+  className = '',
+  isMobile = false
 }: ColorPaletteProps) {
   const [hoveredColor, setHoveredColor] = useState<number | null>(null)
 
@@ -42,26 +44,33 @@ export function ColorPalette({
     const isTransparent = ColorUtils.isTransparent(color)
     const colorName = ColorUtils.getColorName(color)
 
+    // Larger touch targets for mobile
+    const sizeClass = isMobile ? 'w-10 h-10' : 'w-8 h-8'
+    const scaleClass = isMobile 
+      ? (isSelected ? 'scale-105' : '') 
+      : (isSelected ? 'scale-110' : isHovered && !isSelected ? 'scale-105' : '')
+
     return (
       <button
         key={index}
         type="button"
         className={`
-          relative w-8 h-8 rounded border-2 transition-all duration-150 
+          relative ${sizeClass} rounded border-2 transition-all duration-150 
           ${isSelected 
-            ? 'border-blue-500 ring-2 ring-blue-200 scale-110' 
+            ? 'border-blue-500 ring-2 ring-blue-200' 
             : 'border-gray-300 hover:border-gray-400'
           }
-          ${isHovered && !isSelected ? 'scale-105' : ''}
+          ${scaleClass}
           ${disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}
           ${isTransparent ? 'bg-white' : ''}
+          ${isMobile ? 'touch-manipulation' : ''}
         `}
         style={{
           backgroundColor: isTransparent ? 'transparent' : ColorUtils.argbToHexRgb(color)
         }}
         onClick={() => handleColorClick(color)}
-        onMouseEnter={() => handleColorHover(color)}
-        onMouseLeave={() => handleColorHover(null)}
+        onMouseEnter={!isMobile ? () => handleColorHover(color) : undefined}
+        onMouseLeave={!isMobile ? () => handleColorHover(null) : undefined}
         disabled={disabled}
         title={colorName}
         data-testid={`color-${color.toString(16).padStart(8, '0')}`}
@@ -105,8 +114,11 @@ export function ColorPalette({
         )}
       </div>
       
-      {/* 8x4 grid layout for 32 colors */}
-      <div className="grid grid-cols-8 gap-1 p-2 bg-gray-50 rounded-lg border">
+      {/* Responsive grid layout for 32 colors */}
+      <div className={`
+        grid gap-1 p-2 bg-gray-50 rounded-lg border
+        ${isMobile ? 'grid-cols-6 gap-2' : 'grid-cols-8'}
+      `}>
         {COLOR_PALETTE.map((color, index) => renderColorButton(color, index))}
       </div>
       

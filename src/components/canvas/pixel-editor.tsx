@@ -311,6 +311,7 @@ export function PixelEditor({
             selectedColor={state.selectedColor}
             onColorSelect={handleColorSelect}
             disabled={!canEditPixels}
+            isMobile={window.innerWidth < 768}
           />
 
           {/* Quota display */}

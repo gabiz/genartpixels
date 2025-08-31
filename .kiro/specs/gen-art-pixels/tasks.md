@@ -125,7 +125,7 @@
   - Integrate social features with existing frame viewer and dashboard
   - _Requirements: 5.1, 5.2, 5.3, 5.4, 5.5, 5.6, 1.5, 1.6_
 
-- [ ] 14. Create responsive frame viewer
+- [x] 14. Create responsive frame viewer
   - Build public frame viewing page accessible via /userHandle/frameHandle URLs
   - Implement responsive layout that works on mobile and desktop
   - Add touch-optimized controls for mobile pixel placement
