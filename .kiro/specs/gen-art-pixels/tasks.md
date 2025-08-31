@@ -133,13 +133,11 @@
   - Integrate all previous components to create complete frame viewer experience
   - _Requirements: 1.7, 3.8, 8.1, 8.2, 8.3, 8.4, 8.5_
 
-- [ ] 15. Implement user profile and handle management
+- [x] 15. Implement user profile and handle management
   - Create user profile pages showing owned frames and contributions
   - Build handle selection interface during registration
   - Add user statistics and activity tracking
   - Implement user settings and preferences management
-  - Write unit tests for profile data aggregation and statistics calculation
-  - Write component tests for profile interface and settings management
   - Integrate with authentication system to create complete user management flow
   - _Requirements: 2.2, 2.3, 2.4, 2.5, 2.6_
 
@@ -167,6 +165,8 @@
   - Write component tests for social interaction components
   - Implement client-side validation for all forms and inputs
   - Write component tests for responsive behavior and touch interactions
+    - Write unit tests for profile data aggregation and statistics calculation
+  - Write component tests for profile interface and settings management
   - Write end-to-end tests for complete frame viewing and editing workflow
    - Expand end-to-end test coverage for all critical user journeys
   - Add cross-browser compatibility tests for Canvas and real-time features
