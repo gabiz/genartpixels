@@ -25,8 +25,34 @@ export function AuthProvider({ children }: AuthProviderProps) {
     initialized: false,
   })
 
+  // Handle redirect for users who already have accounts - DISABLED DUE TO WEBSOCKET ISSUES
+  // useEffect(() => {
+  //   // Only run this effect once when the user is fully loaded
+  //   if (state.initialized && state.user && !state.loading) {
+  //     const redirectTo = localStorage.getItem('auth_redirect')
+  //     console.log('Checking for redirect:', redirectTo, 'current path:', window.location.pathname)
+      
+  //     if (redirectTo && redirectTo !== window.location.pathname) {
+  //       console.log('Redirecting to:', redirectTo)
+  //       localStorage.removeItem('auth_redirect')
+        
+  //       // Use replace to avoid WebSocket issues and don't keep in history
+  //       setTimeout(() => {
+  //         const redirectUrl = new URL(redirectTo, window.location.origin)
+  //         redirectUrl.searchParams.set('auth_success', Date.now().toString())
+  //         window.location.replace(redirectUrl.toString())
+  //       }, 100)
+  //     } else if (redirectTo) {
+  //       // We're already on the target page, just clean up
+  //       console.log('Already on target page, cleaning up redirect')
+  //       localStorage.removeItem('auth_redirect')
+  //     }
+  //   }
+  // }, [state.initialized, state.user, state.loading])
+
   // Fetch user profile from our users table
   const fetchUserProfile = useCallback(async (supabaseUser: SupabaseUser): Promise<User | null> => {
+    console.log('fetchUserProfile called for user:', supabaseUser.id)
     try {
       const { data, error } = await supabase
         .from('users')
@@ -35,6 +61,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         .single()
 
       if (error) {
+        console.log('fetchUserProfile error:', error.code, error.message)
         if (error.code === 'PGRST116') {
           // User not found in our users table - they need to create a handle
           return null
@@ -42,6 +69,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         throw error
       }
 
+      console.log('fetchUserProfile success:', data.handle)
       return data as User
     } catch (error) {
       console.error('Error fetching user profile:', error)
@@ -49,16 +77,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
   }, [])
 
-  // Handle redirect after successful authentication
-  useEffect(() => {
-    if (state.initialized && state.user && !state.loading) {
-      const redirectTo = localStorage.getItem('auth_redirect')
-      if (redirectTo) {
-        localStorage.removeItem('auth_redirect')
-        window.location.href = redirectTo
-      }
-    }
-  }, [state.initialized, state.user, state.loading])
+
 
   // Initialize auth state and set up auth listener
   useEffect(() => {
@@ -106,9 +125,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
+        console.log('Auth state change:', event, !!session?.user)
         if (!mounted) return
 
         if (event === 'SIGNED_IN' && session?.user) {
+          console.log('Fetching user profile for SIGNED_IN')
           const userProfile = await fetchUserProfile(session.user)
           setState({
             user: userProfile,
@@ -117,6 +138,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
             initialized: true,
           })
         } else if (event === 'SIGNED_OUT') {
+          console.log('Handling SIGNED_OUT')
           setState({
             user: null,
             supabaseUser: null,
@@ -124,6 +146,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
             initialized: true,
           })
         } else if (event === 'TOKEN_REFRESHED' && session?.user) {
+          console.log('Handling TOKEN_REFRESHED')
           // Refresh user profile on token refresh
           const userProfile = await fetchUserProfile(session.user)
           setState(prev => ({

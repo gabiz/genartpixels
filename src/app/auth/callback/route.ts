@@ -12,15 +12,7 @@ export async function GET(request: NextRequest) {
   const code = searchParams.get('code')
   const next = searchParams.get('next') ?? searchParams.get('redirect') ?? '/'
 
-  // Debug logging
-  console.log('Auth callback URL debug:', {
-    fullUrl: request.url,
-    code: code?.substring(0, 10) + '...',
-    next: searchParams.get('next'),
-    redirect: searchParams.get('redirect'),
-    finalNext: next,
-    allParams: Object.fromEntries(searchParams.entries())
-  })
+
 
   if (code) {
     try {
@@ -30,12 +22,7 @@ export async function GET(request: NextRequest) {
       
       const { data, error } = await supabase.auth.exchangeCodeForSession(code)
       
-      console.log('Auth callback debug:', {
-        hasSession: !!data.session,
-        hasUser: !!data.user,
-        userId: data.user?.id,
-        error: error?.message
-      })
+
       
       if (!error) {
         // Successful authentication - redirect to the intended page or home

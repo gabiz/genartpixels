@@ -9,6 +9,7 @@ import React from 'react'
 import { useAuth } from '@/lib/auth/context'
 import { HandleSelection } from '@/components/user/handle-selection'
 import { LoadingSpinner } from '@/components/ui/loading-spinner'
+import { AuthSuccess } from './auth-success'
 
 interface HandleRequiredProps {
   children: React.ReactNode
@@ -32,9 +33,14 @@ export function HandleRequired({ children }: HandleRequiredProps) {
       // Check localStorage for redirect URL
       const redirectTo = localStorage.getItem('auth_redirect')
       
-      if (redirectTo) {
+      if (redirectTo && redirectTo !== window.location.pathname) {
         localStorage.removeItem('auth_redirect') // Clean up
-        window.location.href = redirectTo
+        const redirectUrl = new URL(redirectTo, window.location.origin)
+        redirectUrl.searchParams.set('auth_success', Date.now().toString())
+        window.location.replace(redirectUrl.toString())
+      } else {
+        // Clear the redirect if we're already on the target page
+        localStorage.removeItem('auth_redirect')
       }
       // If no redirect, the component will re-render with the user data
     }

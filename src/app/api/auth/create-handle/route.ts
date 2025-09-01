@@ -45,16 +45,7 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Debug logging
-    console.log('Auth debug:', {
-      hasSession: !!session,
-      hasUser: !!user,
-      userId: user?.id,
-      userEmail: user?.email,
-      sessionError: sessionError?.message,
-      authHeader: request.headers.get('authorization')?.substring(0, 20) + '...',
-      cookieHeader: request.headers.get('cookie')?.substring(0, 100) + '...'
-    })
+
 
     if (!user) {
       console.error('Authentication failed - no user found')
@@ -121,12 +112,6 @@ export async function POST(request: NextRequest) {
     }
 
     // Create user record with handle (using admin client to bypass RLS)
-    console.log('Creating user with data:', {
-      id: user.id,
-      handle: handle,
-      email: user.email || '',
-      avatar_url: user.user_metadata?.avatar_url || null,
-    })
 
     const { data: newUser, error: createError } = await supabaseAdmin
       .from('users')
