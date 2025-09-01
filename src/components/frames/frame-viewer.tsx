@@ -472,7 +472,7 @@ export function FrameViewer({
                   {!user && (
                     <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg text-center">
                       <p className="text-blue-700 dark:text-blue-300">
-                        <a href="/auth" className="font-medium hover:underline">
+                        <a href={`/auth?redirect=${encodeURIComponent(window.location.pathname)}`} className="font-medium hover:underline">
                           Sign in
                         </a>{' '}
                         to start placing pixels and collaborating!
@@ -582,7 +582,7 @@ export function FrameViewer({
             {!user && (
               <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 text-center">
                 <p className="text-blue-700 dark:text-blue-300">
-                  <a href="/auth" className="font-medium hover:underline">
+                  <a href={`/auth?redirect=${encodeURIComponent(window.location.pathname)}`} className="font-medium hover:underline">
                     Sign in
                   </a>{' '}
                   to start placing pixels and collaborating!

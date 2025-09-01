@@ -49,6 +49,17 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
   }, [])
 
+  // Handle redirect after successful authentication
+  useEffect(() => {
+    if (state.initialized && state.user && !state.loading) {
+      const redirectTo = localStorage.getItem('auth_redirect')
+      if (redirectTo) {
+        localStorage.removeItem('auth_redirect')
+        window.location.href = redirectTo
+      }
+    }
+  }, [state.initialized, state.user, state.loading])
+
   // Initialize auth state and set up auth listener
   useEffect(() => {
     let mounted = true
@@ -170,11 +181,21 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
 
     try {
+      // Get the current session to include the access token
+      const { data: { session } } = await supabase.auth.getSession()
+      
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+      }
+      
+      // Include authorization header if we have a session
+      if (session?.access_token) {
+        headers['Authorization'] = `Bearer ${session.access_token}`
+      }
+
       const response = await fetch('/api/auth/create-handle', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers,
         credentials: 'include', // Include cookies for authentication
         body: JSON.stringify({ handle }),
       })

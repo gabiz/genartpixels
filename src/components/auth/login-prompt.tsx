@@ -21,6 +21,14 @@ export function LoginPrompt() {
     setError('')
 
     try {
+      // Get redirect parameter from URL and store in localStorage
+      const urlParams = new URLSearchParams(window.location.search)
+      const redirectTo = urlParams.get('redirect')
+      
+      if (redirectTo) {
+        localStorage.setItem('auth_redirect', redirectTo)
+      }
+      
       await signIn(provider)
       // Redirect will happen automatically via OAuth flow
     } catch (error) {

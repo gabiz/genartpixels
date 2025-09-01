@@ -11,14 +11,53 @@ import type { HandleCreationRequest, HandleCreationResponse } from '@/lib/auth/t
 
 export async function POST(request: NextRequest) {
   try {
-    // Create Supabase client that can read cookies
+    // Create Supabase client that can read cookies for auth
     const cookieStore = cookies()
     const supabase = createRouteHandlerClient({ cookies: () => cookieStore })
+    
+    // Create service role client for database operations (bypasses RLS)
+    const { createClient } = await import('@supabase/supabase-js')
+    const supabaseAdmin = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!,
+      {
+        auth: {
+          autoRefreshToken: false,
+          persistSession: false
+        }
+      }
+    )
 
-    // Get the authenticated user from the session
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    // Try to get session from cookies first
+    let { data: { session }, error: sessionError } = await supabase.auth.getSession()
+    let user = session?.user
 
-    if (authError || !user) {
+    // If no session from cookies, try Authorization header
+    if (!session || !user) {
+      const authHeader = request.headers.get('authorization')
+      if (authHeader?.startsWith('Bearer ')) {
+        const token = authHeader.substring(7)
+        const { data: { user: tokenUser }, error: tokenError } = await supabase.auth.getUser(token)
+        if (!tokenError && tokenUser) {
+          user = tokenUser
+          session = { access_token: token, user: tokenUser } as any
+        }
+      }
+    }
+
+    // Debug logging
+    console.log('Auth debug:', {
+      hasSession: !!session,
+      hasUser: !!user,
+      userId: user?.id,
+      userEmail: user?.email,
+      sessionError: sessionError?.message,
+      authHeader: request.headers.get('authorization')?.substring(0, 20) + '...',
+      cookieHeader: request.headers.get('cookie')?.substring(0, 100) + '...'
+    })
+
+    if (!user) {
+      console.error('Authentication failed - no user found')
       return NextResponse.json(
         { success: false, error: 'Authentication required' },
         { status: 401 }
@@ -37,8 +76,8 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Check if user already has a handle
-    const { data: existingUser, error: checkError } = await supabase
+    // Check if user already has a handle (using admin client to bypass RLS)
+    const { data: existingUser, error: checkError } = await supabaseAdmin
       .from('users')
       .select('id, handle')
       .eq('id', user.id)
@@ -59,8 +98,8 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Check if handle is already taken
-    const { data: handleCheck, error: handleError } = await supabase
+    // Check if handle is already taken (using admin client to bypass RLS)
+    const { data: handleCheck, error: handleError } = await supabaseAdmin
       .from('users')
       .select('handle')
       .eq('handle', handle)
@@ -81,8 +120,15 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Create user record with handle
-    const { data: newUser, error: createError } = await supabase
+    // Create user record with handle (using admin client to bypass RLS)
+    console.log('Creating user with data:', {
+      id: user.id,
+      handle: handle,
+      email: user.email || '',
+      avatar_url: user.user_metadata?.avatar_url || null,
+    })
+
+    const { data: newUser, error: createError } = await supabaseAdmin
       .from('users')
       .insert({
         id: user.id,

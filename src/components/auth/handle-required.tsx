@@ -28,7 +28,18 @@ export function HandleRequired({ children }: HandleRequiredProps) {
 
   // Show handle selection if user is authenticated but doesn't have a handle
   if (supabaseUser && !user) {
-    return <HandleSelection />
+    const handleComplete = () => {
+      // Check localStorage for redirect URL
+      const redirectTo = localStorage.getItem('auth_redirect')
+      
+      if (redirectTo) {
+        localStorage.removeItem('auth_redirect') // Clean up
+        window.location.href = redirectTo
+      }
+      // If no redirect, the component will re-render with the user data
+    }
+    
+    return <HandleSelection onComplete={handleComplete} />
   }
 
   // Show children if user has a handle or is not authenticated
