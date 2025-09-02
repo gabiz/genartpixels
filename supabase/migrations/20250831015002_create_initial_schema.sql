@@ -282,8 +282,11 @@ ALTER TABLE frame_stats ENABLE ROW LEVEL SECURITY;
 ALTER TABLE frame_likes ENABLE ROW LEVEL SECURITY;
 
 -- Users policies
-CREATE POLICY "Users can view their own profile" ON users
-  FOR SELECT USING (auth.uid()::text = id::text);
+-- Make profiles viewable by everyone
+-- CREATE POLICY "Users can view their own profile" ON users
+--   FOR SELECT USING (auth.uid()::text = id::text);
+CREATE POLICY "Profiles are viewable by everyone" ON users
+ FOR SELECT TO authenticated, anon USING ( true );
 
 CREATE POLICY "Users can update their own profile" ON users
   FOR UPDATE USING (auth.uid()::text = id::text);

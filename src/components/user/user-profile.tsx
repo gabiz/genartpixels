@@ -185,7 +185,7 @@ export function UserProfile({ user, ownedFrames, contributedFrames }: UserProfil
           )}
         </div>
 
-        {contributedFrames.length > 0 ? (
+        {contributedFrames.length < 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {contributedFrames.map((contribution) => (
               <div key={contribution.frame_id} className="relative">

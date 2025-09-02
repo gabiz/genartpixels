@@ -22,11 +22,6 @@ export const metadata: Metadata = {
   description: "Create, share, and evolve pixel-based artworks through real-time collaboration. Join the community and express your creativity one pixel at a time.",
   keywords: ["pixel art", "collaborative", "digital art", "community", "creativity"],
   authors: [{ name: "Gen Art Pixels Team" }],
-  viewport: "width=device-width, initial-scale=1",
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
-    { media: "(prefers-color-scheme: dark)", color: "#0a0a0a" }
-  ],
   openGraph: {
     title: "Gen Art Pixels - Collaborative Pixel Art Platform",
     description: "Create, share, and evolve pixel-based artworks through real-time collaboration.",
@@ -38,6 +33,15 @@ export const metadata: Metadata = {
     follow: true,
   },
 };
+
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+    themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#0a0a0a" }
+  ],
+}
 
 export default function RootLayout({
   children,

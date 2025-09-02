@@ -4,7 +4,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/client'
+import { createServerClient } from '@/lib/supabase/client'
 import { APIResponse, APIError, ERROR_CODES } from '@/lib/types'
 
 interface PixelInfo {
@@ -21,7 +21,7 @@ export async function GET(
   { params }: { params: { userHandle: string; frameHandle: string } }
 ) {
   try {
-    const supabase = createClient()
+    const supabase = createServerClient?()
     const { searchParams } = new URL(request.url)
     
     // Get coordinates from query params

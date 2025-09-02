@@ -165,7 +165,7 @@
   - Write component tests for social interaction components
   - Implement client-side validation for all forms and inputs
   - Write component tests for responsive behavior and touch interactions
-    - Write unit tests for profile data aggregation and statistics calculation
+  - Write unit tests for profile data aggregation and statistics calculation
   - Write component tests for profile interface and settings management
   - Write end-to-end tests for complete frame viewing and editing workflow
    - Expand end-to-end test coverage for all critical user journeys

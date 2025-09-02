@@ -25,10 +25,10 @@ interface UserWithStats extends User {
 }
 
 export async function generateMetadata({ params }: UserProfilePageProps): Promise<Metadata> {
-  const { userHandle } = params
+  const { userHandle } = await params
 
   // Create Supabase client for server-side data fetching
-  const cookieStore = cookies()
+  const cookieStore = await cookies()
   const supabase = createServerComponentClient({ cookies: () => cookieStore })
 
   // Fetch user data for metadata
@@ -57,7 +57,7 @@ export async function generateMetadata({ params }: UserProfilePageProps): Promis
 }
 
 async function getUserWithStats(userHandle: string): Promise<UserWithStats | null> {
-  const cookieStore = cookies()
+  const cookieStore = await cookies()
   const supabase = createServerComponentClient({ cookies: () => cookieStore })
 
   // Fetch user data with statistics
@@ -92,7 +92,7 @@ async function getUserWithStats(userHandle: string): Promise<UserWithStats | nul
 }
 
 async function getUserFrames(userHandle: string) {
-  const cookieStore = cookies()
+  const cookieStore = await cookies()
   const supabase = createServerComponentClient({ cookies: () => cookieStore })
 
   // Fetch user's owned frames with stats
@@ -137,20 +137,27 @@ async function getUserFrames(userHandle: string) {
   }, [] as any[])
 
   return {
-    ownedFrames: ownedFrames || [],
+    ownedFrames: ownedFrames ? ownedFrames.map(({ contributors_count, total_pixels, likes_count, last_activity, ...rest }) => ({
+      ...rest,
+      stats: {
+        contributors_count,
+        total_pixels,
+        likes_count,
+        last_activity,
+      },
+    })) : [],
     contributedFrames: uniqueContributedFrames || [],
   }
 }
 
 export default async function UserProfilePage({ params }: UserProfilePageProps) {
-  const { userHandle } = params
+  const { userHandle } = await params
 
   // Validate handle format
   if (!/^[a-zA-Z0-9_-]{5,20}$/.test(userHandle)) {
     notFound()
   }
 
-  // Fetch user data and frames
   const [userWithStats, userFrames] = await Promise.all([
     getUserWithStats(userHandle),
     getUserFrames(userHandle),

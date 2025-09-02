@@ -1,6 +1,16 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "api.dicebear.com",
+        pathname: "/**",
+      },
+    ],
+  },
+
   // Improve WebSocket handling for development
   webpack: (config, { dev }) => {
     if (dev) {
