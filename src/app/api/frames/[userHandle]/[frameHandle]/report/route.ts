@@ -4,8 +4,15 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/client'
+import { createServerClient } from '@/lib/supabase/client'
 import { APIResponse, APIError, ERROR_CODES } from '@/lib/types'
+
+interface RouteParams {
+  params: Promise<{
+    userHandle: string
+    frameHandle: string
+  }>
+}
 
 interface ReportRequest {
   reason: string
@@ -22,11 +29,12 @@ interface ReportResponse {
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { userHandle: string; frameHandle: string } }
+  { params }: RouteParams
 ) {
   try {
-    const supabase = createClient()
-    
+    const supabase = createServerClient()
+    const { userHandle, frameHandle } = await params
+
     // Get current user
     const { data: { user }, error: authError } = await supabase.auth.getUser()
     if (authError || !user) {
@@ -51,8 +59,6 @@ export async function POST(
         success: false
       }, { status: 404 })
     }
-
-    const userHandle = userData.handle
 
     // Parse request body
     const body: ReportRequest = await request.json()
@@ -87,8 +93,8 @@ export async function POST(
     const { data: frame, error: frameError } = await supabase
       .from('frames')
       .select('id, title, owner_handle')
-      .eq('owner_handle', params.userHandle)
-      .eq('handle', params.frameHandle)
+      .eq('owner_handle', userHandle)
+      .eq('handle', frameHandle)
       .single()
 
     if (frameError || !frame) {

@@ -126,11 +126,11 @@ export function ColorPalette({
     <div className={`color-palette ${className}`} role="group" aria-label="Color palette">
       <div className="mb-3">
         <h3 className="text-sm font-medium">Color Palette</h3>
-        {hoveredColor !== null && (
+        {/* {hoveredColor !== null && (
           <p className="text-xs text-muted-foreground mt-1" aria-live="polite">
             {ColorUtils.getColorName(hoveredColor)}
           </p>
-        )}
+        )} */}
       </div>
       
       {/* Responsive grid layout for 32 colors */}

@@ -4,8 +4,15 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/client'
+import { createServerClient } from '@/lib/supabase/client'
 import { APIResponse, APIError, ERROR_CODES } from '@/lib/types'
+
+interface RouteParams {
+  params: Promise<{
+    userHandle: string
+    frameHandle: string
+  }>
+}
 
 interface LikeResponse {
   liked: boolean
@@ -14,11 +21,12 @@ interface LikeResponse {
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { userHandle: string; frameHandle: string } }
+  { params }: RouteParams
 ) {
   try {
-    const supabase = createClient()
-    
+    const supabase = createServerClient()
+    const { userHandle, frameHandle } = await params
+
     // Get current user
     const { data: { user }, error: authError } = await supabase.auth.getUser()
     if (authError || !user) {
@@ -44,14 +52,12 @@ export async function POST(
       }, { status: 404 })
     }
 
-    const userHandle = userData.handle
-
     // Get frame
     const { data: frame, error: frameError } = await supabase
       .from('frames')
       .select('id')
-      .eq('owner_handle', params.userHandle)
-      .eq('handle', params.frameHandle)
+      .eq('owner_handle', userHandle)
+      .eq('handle', frameHandle)
       .single()
 
     if (frameError || !frame) {
@@ -138,10 +144,11 @@ export async function POST(
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { userHandle: string; frameHandle: string } }
+  { params }: RouteParams
 ) {
   try {
-    const supabase = createClient()
+    const supabase = createServerClient()
+    const { frameHandle } = await params
     
     // Get current user (optional for GET)
     const { data: { user } } = await supabase.auth.getUser()
@@ -161,8 +168,8 @@ export async function GET(
     const { data: frame, error: frameError } = await supabase
       .from('frames')
       .select('id')
-      .eq('owner_handle', params.userHandle)
-      .eq('handle', params.frameHandle)
+      .eq('owner_handle', userHandle)
+      .eq('handle', frameHandle)
       .single()
 
     if (frameError || !frame) {

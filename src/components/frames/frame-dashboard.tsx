@@ -103,11 +103,18 @@ export function FrameDashboard({ initialData, className = '' }: FrameDashboardPr
   // Calculate total pages
   const totalPages = Math.ceil(totalItems / itemsPerPage)
 
-  // Auto-refresh every 30 seconds for real-time updates
+  // Initial fetch if no initialData is provided
   useEffect(() => {
-    const interval = setInterval(refreshFrames, 30000)
-    return () => clearInterval(interval)
-  }, [refreshFrames])
+    if (!initialData) {
+      fetchFrames(currentPage, search, sortBy, sortOrder)
+    }
+  }, [initialData, fetchFrames, currentPage, search, sortBy, sortOrder])
+
+  // Auto-refresh every 30 seconds for real-time updates
+  // useEffect(() => {
+  //   const interval = setInterval(refreshFrames, 30000)
+  //   return () => clearInterval(interval)
+  // }, [refreshFrames])
 
   return (
     <div className={`space-y-6 ${className}`}>

@@ -7,6 +7,13 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@/lib/supabase/client'
 import { APIResponse, APIError, ERROR_CODES } from '@/lib/types'
 
+interface RouteParams {
+  params: Promise<{
+    userHandle: string
+    frameHandle: string
+  }>
+}
+
 interface PixelInfo {
   x: number
   y: number
@@ -18,12 +25,13 @@ interface PixelInfo {
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { userHandle: string; frameHandle: string } }
+  { params }: RouteParams
 ) {
   try {
-    const supabase = createServerClient?()
+    const supabase = createServerClient()
     const { searchParams } = new URL(request.url)
-    
+    const { userHandle, frameHandle } = await params
+
     // Get coordinates from query params
     const xParam = searchParams.get('x')
     const yParam = searchParams.get('y')
@@ -51,8 +59,8 @@ export async function GET(
     const { data: frame, error: frameError } = await supabase
       .from('frames')
       .select('id, width, height')
-      .eq('owner_handle', params.userHandle)
-      .eq('handle', params.frameHandle)
+      .eq('owner_handle', userHandle)
+      .eq('handle', frameHandle)
       .single()
 
     if (frameError || !frame) {
