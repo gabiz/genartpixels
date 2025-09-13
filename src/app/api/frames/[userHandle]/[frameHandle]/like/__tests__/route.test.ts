@@ -19,7 +19,7 @@ const mockSupabaseInstance = {
 }
 
 jest.mock('@/lib/supabase/client', () => ({
-  createClient: jest.fn(() => mockSupabaseInstance)
+  createServerClient: jest.fn(() => mockSupabaseInstance)
 }))
 
 describe('/api/frames/[userHandle]/[frameHandle]/like', () => {

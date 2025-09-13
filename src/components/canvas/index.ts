@@ -4,6 +4,6 @@ export { CanvasContainer, type CanvasContainerProps } from './canvas-container'
 export { ColorPalette, type ColorPaletteProps } from './color-palette'
 export { QuotaDisplay, type QuotaDisplayProps } from './quota-display'
 export { PixelFeedbackDisplay, usePixelFeedback, type PixelFeedbackProps, type PixelFeedback, type FeedbackType } from './pixel-feedback'
-export { PixelEditor, type PixelEditorProps, type PixelEditorState } from './pixel-editor'e
-xport { PixelInfoTooltip } from './pixel-info-tooltip'
+export { PixelEditor, type PixelEditorProps, type PixelEditorState } from './pixel-editor'
+export { PixelInfoTooltip } from './pixel-info-tooltip'
 export { InteractiveFrameCanvas } from './interactive-frame-canvas'

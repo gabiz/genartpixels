@@ -74,6 +74,10 @@ export async function POST(request: NextRequest) {
     // Parse request body
     const body: PlacePixelRequest = await request.json()
     const { frameId, x, y, color } = body
+    console.log("userData:", userData)
+    console.log("frameId:", frameId)
+    console.log("x:", x, " y:", y)
+    console.log("color:", color)
 
     // Validate input
     if (!frameId || typeof frameId !== 'string') {

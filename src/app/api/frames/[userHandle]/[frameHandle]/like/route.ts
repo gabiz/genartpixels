@@ -148,11 +148,11 @@ export async function GET(
 ) {
   try {
     const supabase = createServerClient()
-    const { frameHandle } = await params
+    const { userHandle, frameHandle } = await params
     
     // Get current user (optional for GET)
     const { data: { user } } = await supabase.auth.getUser()
-    let userHandle: string | null = null
+    let loginUserHandle: string | null = null
 
     if (user) {
       const { data: userData } = await supabase
@@ -161,7 +161,7 @@ export async function GET(
         .eq('id', user.id)
         .single()
       
-      userHandle = userData?.handle || null
+        loginUserHandle = userData?.handle || null
     }
 
     // Get frame
@@ -182,12 +182,12 @@ export async function GET(
 
     // Check if current user liked this frame
     let liked = false
-    if (userHandle) {
+    if (loginUserHandle) {
       const { data: existingLike } = await supabase
         .from('frame_likes')
         .select('id')
         .eq('frame_id', frame.id)
-        .eq('user_handle', userHandle)
+        .eq('user_handle', loginUserHandle)
         .single()
 
       liked = !!existingLike

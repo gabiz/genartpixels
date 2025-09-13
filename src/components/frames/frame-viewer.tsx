@@ -214,7 +214,7 @@ export function FrameViewer({
   }, [])
 
   const handleShareFrame = useCallback(async () => {
-    const url = `${window.location.origin}/${frameOwnerHandle}/${frameHandle}`
+    const url = `${process.env.NEXT_PUBLIC_APP_URL}/${frameOwnerHandle}/${frameHandle}`
     
     if (navigator.share) {
       try {

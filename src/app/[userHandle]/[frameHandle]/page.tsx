@@ -5,8 +5,9 @@
 
 import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
-import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
+import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
+import type { Database } from '@/lib/supabase/database.types'
 import { FrameViewer } from '@/components/frames/frame-viewer'
 import type { FrameWithStats, FramePermission } from '@/lib/types'
 
@@ -17,31 +18,18 @@ interface PageProps {
   }>
 }
 
-async function createSupabaseClient() {
-  const cookieStore = await cookies()
-  return createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return cookieStore.getAll()
-        },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) => {
-            cookieStore.set(name, value, options)
-          })
-        },
-      },
-    }
-  )
-}
-
 async function getFrameData(userHandle: string, frameHandle: string) {
-  const supabase = await createSupabaseClient()
+  // const supabase = createServerComponentClient<Database>({
+  //   cookies: () => cookies(),
+  // })
+  const cookieStore = await cookies()
+  const supabase = createServerComponentClient({ cookies: () => cookieStore })
 
   // Get the current user (if authenticated)
-  const { data: { user } } = await supabase.auth.getUser()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
   let currentUserHandle: string | null = null
 
   if (user) {
@@ -50,7 +38,7 @@ async function getFrameData(userHandle: string, frameHandle: string) {
       .select('handle')
       .eq('id', user.id)
       .single()
-    
+
     currentUserHandle = userData?.handle || null
   }
 

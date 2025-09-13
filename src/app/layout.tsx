@@ -66,7 +66,7 @@ export default function RootLayout({
         
         <AuthProvider>
           <AuthRedirectHandler />
-          <HandleRequired>
+           <HandleRequired>
             <div id="root" className="relative flex min-h-screen flex-col">
               <main id="main-content" className="flex-1">
                 {children}

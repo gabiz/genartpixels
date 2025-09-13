@@ -16,7 +16,7 @@ export const metadata: Metadata = {
 }
 
 async function getCurrentUser() {
-  const cookieStore = cookies()
+  const cookieStore = await cookies()
   const supabase = createServerComponentClient({ cookies: () => cookieStore })
 
   const { data: { user: supabaseUser } } = await supabase.auth.getUser()

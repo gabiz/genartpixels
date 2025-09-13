@@ -10,9 +10,10 @@ import { validateHandle, VALIDATION_MESSAGES } from '@/lib/validation'
 import type { HandleCreationRequest, HandleCreationResponse } from '@/lib/auth/types'
 
 export async function POST(request: NextRequest) {
+  console.log("create handle called")
   try {
     // Create Supabase client that can read cookies for auth
-    const cookieStore = cookies()
+    const cookieStore = await cookies()
     const supabase = createRouteHandlerClient({ cookies: () => cookieStore })
     
     // Create service role client for database operations (bypasses RLS)

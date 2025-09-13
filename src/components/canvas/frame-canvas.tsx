@@ -53,11 +53,16 @@ export const FrameCanvas = forwardRef<FrameCanvasRef, FrameCanvasProps>(({
 }, ref) => {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
+  
   const [currentViewport, setCurrentViewport] = useState<CanvasViewport>(viewport)
-  // const [isDragging, setIsDragging] = useState(false)
-  // const [lastMousePos, setLastMousePos] = useState({ x: 0, y: 0 })
-  const animationFrameRef = useRef<number>()
+  
+  const [isDragging, setIsDragging] = useState(false)
+  const [isOneTouch, setIsOneTouch] = useState(false)
+  const [firstMousePos, setFirstMousePos] = useState({ x: 0, y: 0 })
+  const [lastMousePos, setLastMousePos] = useState({ x: 0, y: 0 })
 
+  const animationFrameRef = useRef<number | null>(null)
+  
   // Create pixel lookup map for efficient rendering
   const pixelMap = React.useMemo(() => {
     const map = new Map<string, number>()
@@ -95,13 +100,6 @@ export const FrameCanvas = forwardRef<FrameCanvasRef, FrameCanvasProps>(({
     const visibleRight = Math.ceil((-panX + canvasWidth / (2 * zoom)) / pixelSize)
     const visibleTop = Math.floor((-panY - canvasHeight / (2 * zoom)) / pixelSize)
     const visibleBottom = Math.ceil((-panY + canvasHeight / (2 * zoom)) / pixelSize)
-
-    // Clamp to frame bounds
-    // const startX = Math.max(0, visibleLeft)
-    // const endX = Math.min(frame.width, visibleRight)
-    // const startY = Math.max(0, visibleTop)
-    // const endY = Math.min(frame.height, visibleBottom)
-    // const pixelSize = 1
 
     // Compute visible bounds in frame coordinates
     const halfWidth = canvasWidth / (2 * zoom)
@@ -167,14 +165,9 @@ export const FrameCanvas = forwardRef<FrameCanvasRef, FrameCanvasProps>(({
     canvas.style.width = `${rect.width}px`
     canvas.style.height = `${rect.height}px`
 
-    // const ctx = canvas.getContext('2d')
-    // if (ctx) {
-    //   ctx.scale(dpr, dpr)
-    // }
-    // FIX: reset transform so we control scaling ourselves in render()
     const ctx = canvas.getContext('2d')
     if (ctx) {
-      // ctx.setTransform(1, 0, 0, 1, 0, 0)  // reset
+      ctx.setTransform(1, 0, 0, 1, 0, 0)  // reset
     }
 
     render()
@@ -232,96 +225,7 @@ export const FrameCanvas = forwardRef<FrameCanvasRef, FrameCanvasProps>(({
     return { x: pixelX, y: pixelY }
   }, [frame, currentViewport])
 
-  // Handle mouse events
-  // const handleMouseDown = useCallback((e: React.MouseEvent) => {
-  //   if (e.button === 0) { // Left click
-  //     const pixelCoord = screenToPixel(e.clientX, e.clientY)
-  //     if (pixelCoord && interaction?.onPixelClick) {
-  //       interaction.onPixelClick(pixelCoord.x, pixelCoord.y)
-  //     }
-  //   } else if (e.button === 1 || e.button === 2) { // Middle or right click for panning
-  //     setIsDragging(true)
-  //     setLastMousePos({ x: e.clientX, y: e.clientY })
-  //     e.preventDefault()
-  //   }
-  // }, [screenToPixel, interaction])
-
-  // const handleMouseMove = useCallback((e: React.MouseEvent) => {
-  //   if (isDragging) {
-  //     const deltaX = e.clientX - lastMousePos.x
-  //     const deltaY = e.clientY - lastMousePos.y
-      
-  //     const newViewport = {
-  //       ...currentViewport,
-  //       x: currentViewport.x + deltaX / currentViewport.zoom,
-  //       y: currentViewport.y + deltaY / currentViewport.zoom
-  //     }
-      
-  //     setCurrentViewport(newViewport)
-  //     setLastMousePos({ x: e.clientX, y: e.clientY })
-      
-  //     if (interaction?.onViewportChange) {
-  //       interaction.onViewportChange(newViewport)
-  //     }
-  //   } else {
-  //     const pixelCoord = screenToPixel(e.clientX, e.clientY)
-  //     if (pixelCoord && interaction?.onPixelHover) {
-  //       interaction.onPixelHover(pixelCoord.x, pixelCoord.y)
-  //     }
-  //   }
-  // }, [isDragging, lastMousePos, currentViewport, screenToPixel, interaction])
-
-  // const handleMouseUp = useCallback(() => {
-  //   setIsDragging(false)
-  // }, [])
-
-  
-  // const handleWheel = useCallback((e: React.WheelEvent) => {
-  //   e.preventDefault()
-    
-  //   const zoomDelta = e.deltaY > 0 ? 1 / ZOOM_FACTOR : ZOOM_FACTOR
-  //   const newZoom = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, currentViewport.zoom * zoomDelta))
-    
-  //   // Zoom towards mouse position
-  //   const canvas = canvasRef.current
-  //   if (canvas) {
-  //     const rect = canvas.getBoundingClientRect()
-  //     const mouseX = e.clientX - rect.left - rect.width / 2
-  //     const mouseY = e.clientY - rect.top - rect.height / 2
-      
-  //     const zoomRatio = newZoom / currentViewport.zoom
-  //     const newViewport = {
-  //       x: currentViewport.x + mouseX * (1 - zoomRatio) / currentViewport.zoom,
-  //       y: currentViewport.y + mouseY * (1 - zoomRatio) / currentViewport.zoom,
-  //       zoom: newZoom
-  //     }
-      
-  //     setCurrentViewport(newViewport)
-      
-  //     if (interaction?.onViewportChange) {
-  //       interaction.onViewportChange(newViewport)
-  //     }
-  //   }
-  // }, [currentViewport, interaction])
-
-  // useEffect(() => {
-  //   const canvas = canvasRef.current
-  //   if (!canvas) return
-  
-  //   const handleWheelRaw = (e: WheelEvent) => {
-  //     if (!canvas.contains(e.target as Node)) return
-  //     e.preventDefault() // now allowed
-  //     handleWheel(e as unknown as React.WheelEvent)
-  //   }
-  
-  //   document.addEventListener('wheel', handleWheelRaw, { passive: false })
-  
-  //   return () => {
-  //     document.removeEventListener('wheel', handleWheelRaw)
-  //   }
-  // }, [handleWheel])
-
-  const handleWheelSafe = (e: WheelEvent) => {
+  const handleWheelSafe = useCallback((e: WheelEvent) => {
     // Skip pinch-to-zoom gestures that are passive
     if (!e.ctrlKey) {
       e.preventDefault()
@@ -344,7 +248,8 @@ export const FrameCanvas = forwardRef<FrameCanvasRef, FrameCanvasProps>(({
     }
     setCurrentViewport(newViewport)
     interaction?.onViewportChange?.(newViewport)
-  }
+    
+  }, [currentViewport, interaction])
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -381,18 +286,11 @@ export const FrameCanvas = forwardRef<FrameCanvasRef, FrameCanvasProps>(({
   const [minZoom, setMinZoom] = useState(1)
 
   useEffect(() => {
+    console.log("use effect")
     const fitZoom = fitToFrame()
+    console.log("min zoom", fitZoom)
     setMinZoom(fitZoom || 1)
   }, [frame, canvasRef.current])
-
-  useEffect(() => {
-    const handleResize = () => {
-      const fitZoom = fitToFrame()
-      setMinZoom(fitZoom || 1)
-    }
-    window.addEventListener('resize', handleResize)
-    return () => window.removeEventListener('resize', handleResize)
-  }, [fitToFrame])
 
   // Expose methods via ref
   useImperativeHandle(ref, () => ({
@@ -441,11 +339,6 @@ export const FrameCanvas = forwardRef<FrameCanvasRef, FrameCanvasProps>(({
     }
   }, [render])
 
-  // useEffect(() => {
-  //   fitToFrame()
-  // }, [])
-
-  // Handle resize
   // Update viewport when prop changes
   useEffect(() => {
     if (viewport) {
@@ -461,98 +354,61 @@ export const FrameCanvas = forwardRef<FrameCanvasRef, FrameCanvasProps>(({
   useEffect(() => {
     handleResize()
 
-    if (!viewport) {
-      fitToFrame()
-    }
-
     window.addEventListener('resize', handleResize)
     return () => window.removeEventListener('resize', handleResize)
   }, [handleResize, fitToFrame, viewport])
 
-  // Global mouse events for dragging
-  // useEffect(() => {
-  //   if (isDragging) {
-  //     const handleGlobalMouseMove = (e: MouseEvent) => {
-  //       const deltaX = e.clientX - lastMousePos.x
-  //       const deltaY = e.clientY - lastMousePos.y
-        
-  //       const newViewport = {
-  //         ...currentViewport,
-  //         x: currentViewport.x + deltaX / currentViewport.zoom,
-  //         y: currentViewport.y + deltaY / currentViewport.zoom
-  //       }
-        
-  //       setCurrentViewport(newViewport)
-  //       setLastMousePos({ x: e.clientX, y: e.clientY })
-        
-  //       if (interaction?.onViewportChange) {
-  //         interaction.onViewportChange(newViewport)
-  //       }
-  //     }
-
-  //     const handleGlobalMouseUp = () => {
-  //       setIsDragging(false)
-  //     }
-
-  //     document.addEventListener('mousemove', handleGlobalMouseMove)
-  //     document.addEventListener('mouseup', handleGlobalMouseUp)
+  const handleMouseDown = useCallback((e: MouseEvent) => {
+    if (e.button === 0) { // Left click
+      const pixelCoord = screenToPixel(e.clientX, e.clientY)
+      if (pixelCoord && interaction?.onPixelClick) {
+        interaction.onPixelClick(pixelCoord.x, pixelCoord.y)
+      }
+    } else if (e.button === 1 || e.button === 2) { // Middle or right click for panning
+      setIsDragging(true)
+      setLastMousePos({ x: e.clientX, y: e.clientY })
+      e.preventDefault()
+    }
+  }, [screenToPixel, interaction])
+  
+  const handleMouseMove = useCallback((e: MouseEvent) => {
+    if (isDragging) {
+      const deltaX = e.clientX - lastMousePos.x
+      const deltaY = e.clientY - lastMousePos.y
       
-  //     return () => {
-  //       document.removeEventListener('mousemove', handleGlobalMouseMove)
-  //       document.removeEventListener('mouseup', handleGlobalMouseUp)
-  //     }
-  //   }
-  // }, [isDragging, lastMousePos, currentViewport, interaction])
+      const newPan = {
+        x: currentViewport.x + deltaX / currentViewport.zoom,
+        y: currentViewport.y + deltaY / currentViewport.zoom
+      }
+      const clampedPan = clampPan(newPan, currentViewport.zoom)
+      const newViewport = {
+        ...currentViewport,
+        ...clampedPan
+      }
 
-  const [isDragging, setIsDragging] = useState(false)
-  const [draggingButton, setDraggingButton] = useState<number | null>(null)
-  const [lastMousePos, setLastMousePos] = useState({ x: 0, y: 0 })
-  
-  const handleMouseDown = (e: React.MouseEvent) => {
-    // Allow left (0), middle (1), right (2) for dragging
-    setIsDragging(true)
-    setDraggingButton(e.button)
-    setLastMousePos({ x: e.clientX, y: e.clientY })
-    e.preventDefault()
-  }
-  
-  const handleMouseMove = (e: MouseEvent) => {
-    if (!isDragging) return
-  
-    const deltaX = e.clientX - lastMousePos.x
-    const deltaY = e.clientY - lastMousePos.y
-  
-    // const newViewport = {
-    //   ...currentViewport,
-    //   x: currentViewport.x + deltaX / currentViewport.zoom,
-    //   y: currentViewport.y + deltaY / currentViewport.zoom
-    // }
-  
-    const newPan = {
-      x: currentViewport.x + deltaX / currentViewport.zoom,
-      y: currentViewport.y + deltaY / currentViewport.zoom
-    }
-    const clampedPan = clampPan(newPan, currentViewport.zoom)
-    const newViewport = {
-      ...currentViewport,
-      ...clampedPan
-    }
+      setCurrentViewport(newViewport)
+      setLastMousePos({ x: e.clientX, y: e.clientY })
+      interaction?.onViewportChange?.(newViewport)
 
-    setCurrentViewport(newViewport)
-    setLastMousePos({ x: e.clientX, y: e.clientY })
-    interaction?.onViewportChange?.(newViewport)
-  }
+    } else {
+      const pixelCoord = screenToPixel(e.clientX, e.clientY)
+      if (pixelCoord && interaction?.onPixelHover) {
+        interaction.onPixelHover(pixelCoord.x, pixelCoord.y)
+      }
+    }
+  }, [isDragging, lastMousePos, currentViewport, screenToPixel, interaction])
   
-  const handleMouseUp = () => {
+  const handleMouseUp = useCallback(() => {
     setIsDragging(false)
-    setDraggingButton(null)
-  }
+  }, [])
   
   // Attach global listeners once
   useEffect(() => {
-    document.addEventListener('mousemove', handleMouseMove)
-    document.addEventListener('mouseup', handleMouseUp)
+    document.addEventListener('mousedown', handleMouseDown, { passive: false })
+    document.addEventListener('mousemove', handleMouseMove, { passive: false })
+    document.addEventListener('mouseup', handleMouseUp, { passive: false })
     return () => {
+      document.removeEventListener('mousedown', handleMouseDown)
       document.removeEventListener('mousemove', handleMouseMove)
       document.removeEventListener('mouseup', handleMouseUp)
     }
@@ -566,27 +422,25 @@ export const FrameCanvas = forwardRef<FrameCanvasRef, FrameCanvasProps>(({
   
     const handleTouchStart = (e: TouchEvent) => {
       if (e.touches.length === 1) {
-        setIsDragging(true)
+        setFirstMousePos({ x: e.touches[0].clientX, y: e.touches[0].clientY })
         setLastMousePos({ x: e.touches[0].clientX, y: e.touches[0].clientY })
+        setIsOneTouch(true)
       } else if (e.touches.length === 2) {
         // Pinch start
         const dx = e.touches[0].clientX - e.touches[1].clientX
         const dy = e.touches[0].clientY - e.touches[1].clientY
         lastTouchDist = Math.sqrt(dx*dx + dy*dy)
+        setIsDragging(false)
+        setIsOneTouch(false)
       }
       e.preventDefault()
     }
   
     const handleTouchMove = (e: TouchEvent) => {
-      if (e.touches.length === 1 && isDragging) {
+      if (e.touches.length === 1 && isOneTouch) {
+        setIsDragging(false)
         const deltaX = e.touches[0].clientX - lastMousePos.x
         const deltaY = e.touches[0].clientY - lastMousePos.y
-        // const newViewport = {
-        //   ...currentViewport,
-        //   x: currentViewport.x + deltaX / currentViewport.zoom,
-        //   y: currentViewport.y + deltaY / currentViewport.zoom,
-        // }
-        // setCurrentViewport(newViewport)
         const newPan = {
           x: currentViewport.x + deltaX / currentViewport.zoom,
           y: currentViewport.y + deltaY / currentViewport.zoom
@@ -601,13 +455,13 @@ export const FrameCanvas = forwardRef<FrameCanvasRef, FrameCanvasProps>(({
         setLastMousePos({ x: e.touches[0].clientX, y: e.touches[0].clientY })
         interaction?.onViewportChange?.(newViewport)
       } else if (e.touches.length === 2) {
+        setIsDragging(false)
         const dx = e.touches[0].clientX - e.touches[1].clientX
         const dy = e.touches[0].clientY - e.touches[1].clientY
         const dist = Math.sqrt(dx*dx + dy*dy)
       
         if (lastTouchDist > 0) {
           const zoomDelta = dist / lastTouchDist
-          // const newZoom = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, currentViewport.zoom * zoomDelta))
           const newZoom = Math.max(minZoom, Math.min(MAX_ZOOM, currentViewport.zoom * zoomDelta))      
 
           // Find midpoint of the two touches
@@ -635,6 +489,15 @@ export const FrameCanvas = forwardRef<FrameCanvasRef, FrameCanvasProps>(({
     }
   
     const handleTouchEnd = () => {
+      if (isOneTouch) {
+        if ((lastMousePos.x - firstMousePos.x < 10) &&
+          (lastMousePos.y - firstMousePos.y < 10)) {
+          const pixelCoord = screenToPixel(lastMousePos.x, lastMousePos.y)
+          if (pixelCoord && interaction?.onPixelClick) {
+            interaction.onPixelClick(pixelCoord.x, pixelCoord.y)
+          }
+        }
+      }
       setIsDragging(false)
     }
   
@@ -647,7 +510,7 @@ export const FrameCanvas = forwardRef<FrameCanvasRef, FrameCanvasProps>(({
       canvas.removeEventListener("touchmove", handleTouchMove)
       canvas.removeEventListener("touchend", handleTouchEnd)
     }
-  }, [currentViewport, isDragging, lastMousePos, interaction])
+  }, [currentViewport, isDragging, firstMousePos, lastMousePos, interaction])
   
   return (
     <div 
@@ -657,9 +520,9 @@ export const FrameCanvas = forwardRef<FrameCanvasRef, FrameCanvasProps>(({
       <canvas
         ref={canvasRef}
         className="block cursor-crosshair"
-        onMouseDown={handleMouseDown}
-        onMouseMove={handleMouseMove}
-        onMouseUp={handleMouseUp}
+        // onMouseDown={handleMouseDown}
+        // onMouseMove={handleMouseMove}
+        // onMouseUp={handleMouseUp}
         // onWheel={handleWheelSafe}
         onContextMenu={(e) => e.preventDefault()}
       />
