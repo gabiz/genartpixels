@@ -18,7 +18,7 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   }
 })
 
-// Server-side client for API routes
+// // Server-side client for API routes
 export const createServerClient = () => {
   return createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -31,3 +31,4 @@ export const createServerClient = () => {
     }
   )
 }
+

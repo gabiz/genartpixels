@@ -3,7 +3,7 @@
  * Handles creation, retrieval, and cleanup of frame snapshots
  */
 
-import { createServerClient } from '@/lib/supabase/client'
+import { supabase as global_supabase } from '@/lib/supabase/client'
 import { Pixel, FrameSnapshot, FrameSnapshotInsert, Frame } from '@/lib/types'
 import { CompressionUtils } from './compression-utils'
 
@@ -11,7 +11,7 @@ import { CompressionUtils } from './compression-utils'
  * Snapshot manager for frame data compression and storage
  */
 export class SnapshotManager {
-  private supabase = createServerClient()
+  private supabase = global_supabase // createServerClient()
 
   /**
    * Create a new snapshot for a frame

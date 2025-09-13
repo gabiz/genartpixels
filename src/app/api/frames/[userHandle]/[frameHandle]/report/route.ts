@@ -4,7 +4,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { createServerClient } from '@/lib/supabase/client'
+import { createServerClient } from '@/lib/supabase/serverClient'
 import { APIResponse, APIError, ERROR_CODES } from '@/lib/types'
 
 interface RouteParams {
@@ -32,7 +32,7 @@ export async function POST(
   { params }: RouteParams
 ) {
   try {
-    const supabase = createServerClient()
+    const supabase = await createServerClient()
     const { userHandle, frameHandle } = await params
 
     // Get current user

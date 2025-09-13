@@ -35,7 +35,8 @@ export function HandleRequired({ children }: HandleRequiredProps) {
       
       if (redirectTo && redirectTo !== window.location.pathname) {
         localStorage.removeItem('auth_redirect') // Clean up
-        const redirectUrl = new URL(redirectTo, window.location.origin)
+        // const redirectUrl = new URL(redirectTo, window.location.origin)
+        const redirectUrl = new URL(redirectTo, process.env.NEXT_PUBLIC_APP_URL)
         redirectUrl.searchParams.set('auth_success', Date.now().toString())
         window.location.replace(redirectUrl.toString())
       } else {

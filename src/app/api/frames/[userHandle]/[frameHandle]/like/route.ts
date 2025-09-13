@@ -4,7 +4,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { createServerClient } from '@/lib/supabase/client'
+import { createServerClient } from '@/lib/supabase/serverClient'
 import { APIResponse, APIError, ERROR_CODES } from '@/lib/types'
 
 interface RouteParams {
@@ -18,13 +18,12 @@ interface LikeResponse {
   liked: boolean
   likesCount: number
 }
-
 export async function POST(
   request: NextRequest,
   { params }: RouteParams
 ) {
   try {
-    const supabase = createServerClient()
+    const supabase = await createServerClient()
     const { userHandle, frameHandle } = await params
 
     // Get current user
@@ -73,7 +72,7 @@ export async function POST(
       .from('frame_likes')
       .select('id')
       .eq('frame_id', frame.id)
-      .eq('user_handle', userHandle)
+      .eq('user_handle', userData?.handle)
       .single()
 
     let liked = false
@@ -84,7 +83,7 @@ export async function POST(
         .from('frame_likes')
         .delete()
         .eq('frame_id', frame.id)
-        .eq('user_handle', userHandle)
+        .eq('user_handle', userData?.handle)
 
       if (deleteError) {
         return NextResponse.json<APIError>({
@@ -101,7 +100,7 @@ export async function POST(
         .from('frame_likes')
         .insert({
           frame_id: frame.id,
-          user_handle: userHandle
+          user_handle: userData?.handle
         })
 
       if (insertError) {
@@ -147,7 +146,7 @@ export async function GET(
   { params }: RouteParams
 ) {
   try {
-    const supabase = createServerClient()
+    const supabase = await createServerClient()
     const { userHandle, frameHandle } = await params
     
     // Get current user (optional for GET)

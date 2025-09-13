@@ -5,8 +5,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { createServerClient } from '@supabase/ssr'
-import { cookies } from 'next/headers'
+import { createServerClient } from '@/lib/supabase/serverClient'
 import {
   validateFrameHandle,
   validateFrameTitle,
@@ -26,29 +25,9 @@ import type {
   FramePermissionType
 } from '@/lib/types'
 
-async function createSupabaseClient() {
-  const cookieStore = await cookies()
-  return createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return cookieStore.getAll()
-        },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) => {
-            cookieStore.set(name, value, options)
-          })
-        },
-      },
-    }
-  )
-}
-
 export async function GET(request: NextRequest) {
   try {
-    const supabase = await createSupabaseClient()
+    const supabase = await createServerClient()
 
     // Parse query parameters
     const { searchParams } = new URL(request.url)

@@ -4,7 +4,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/client'
+import { createServerClient } from '@/lib/supabase/serverClient'
 import { APIResponse, APIError } from '@/lib/types'
 
 interface LeaderboardFrame {
@@ -42,7 +42,7 @@ interface LeaderboardResponse {
 
 export async function GET(request: NextRequest) {
   try {
-    const supabase = createClient()
+    const supabase = await createServerClient()
     const { searchParams } = new URL(request.url)
     
     const type = (searchParams.get('type') || 'frames') as LeaderboardType

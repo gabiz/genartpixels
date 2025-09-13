@@ -13,7 +13,7 @@ const mockUser = {
   id: 'test-user-id',
   handle: 'test_user',
   email: 'test@example.com',
-  avatar_url: 'https://via.placeholder.com/80',
+  avatar_url: 'https://api.dicebear.com/7.x/pixel-art/png?seed=master',
   pixels_available: 75,
   last_refill: '2024-01-01T12:00:00Z',
   created_at: '2024-01-01T00:00:00Z',
@@ -34,9 +34,11 @@ const mockOwnedFrames = [
     width: 128,
     height: 128,
     created_at: '2024-01-01T00:00:00Z',
-    contributors_count: 3,
-    total_pixels: 50,
-    likes_count: 2,
+    stats: {
+      contributors_count: 3,
+      total_pixels: 50,
+      likes_count: 2,
+    }
   },
   {
     id: 'frame-2',
@@ -47,9 +49,11 @@ const mockOwnedFrames = [
     width: 256,
     height: 256,
     created_at: '2024-01-02T00:00:00Z',
-    contributors_count: 5,
-    total_pixels: 120,
-    likes_count: 8,
+    stats: {
+      contributors_count: 5,
+      total_pixels: 120,
+      likes_count: 8,
+    }
   },
 ]
 
@@ -118,7 +122,7 @@ export default function UserProfileTestPage() {
           </nav>
         </div>
 
-        {/* Tab Content */}
+        Tab Content
         {activeTab === 'profile' && (
           <div>
             <h2 className="text-xl font-semibold mb-4">User Profile Component</h2>

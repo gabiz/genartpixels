@@ -14,13 +14,13 @@ import { FrameWithStats } from '@/lib/types'
 // Mock frame data for testing
 const mockFrame: FrameWithStats = {
   id: 'frame-123',
-  handle: 'test-frame',
+  handle: 'view-test',
   title: 'Test Collaborative Frame',
   description: 'A test frame for demonstrating social features',
   keywords: ['test', 'social', 'demo'],
-  owner_handle: 'testuser',
-  width: 128,
-  height: 128,
+  owner_handle: 'viewtester',
+  width: 64,
+  height: 64,
   permissions: 'open',
   is_frozen: false,
   created_at: '2024-01-01T00:00:00Z',
@@ -177,7 +177,7 @@ export default function SocialFeaturesTestPage() {
               <PixelInfoTooltip
                 frameOwnerHandle={mockFrame.owner_handle}
                 frameHandle={mockFrame.handle}
-                x={64}
+                x={62}
                 y={32}
                 visible={showPixelTooltip}
                 onClose={() => setShowPixelTooltip(false)}
@@ -238,7 +238,7 @@ export default function SocialFeaturesTestPage() {
 
               <button
                 onClick={() => {
-                  fetch(`/api/frames/${mockFrame.owner_handle}/${mockFrame.handle}/pixel?x=64&y=32`)
+                  fetch(`/api/frames/${mockFrame.owner_handle}/${mockFrame.handle}/pixel?x=62&y=32`)
                     .then(res => res.json())
                     .then(data => console.log('Pixel info:', data))
                     .catch(err => console.error('Error:', err))

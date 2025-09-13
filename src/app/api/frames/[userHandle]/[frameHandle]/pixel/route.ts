@@ -4,7 +4,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { createServerClient } from '@/lib/supabase/client'
+import { createServerClient } from '@/lib/supabase/serverClient'
 import { APIResponse, APIError, ERROR_CODES } from '@/lib/types'
 
 interface RouteParams {
@@ -28,7 +28,7 @@ export async function GET(
   { params }: RouteParams
 ) {
   try {
-    const supabase = createServerClient()
+    const supabase = await createServerClient()
     const { searchParams } = new URL(request.url)
     const { userHandle, frameHandle } = await params
 

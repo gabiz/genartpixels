@@ -4,8 +4,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { createServerClient } from '@supabase/ssr'
-import { cookies } from 'next/headers'
+import { createServerClient } from '@/lib/supabase/serverClient'
 
 interface RouteParams {
   params: Promise<{
@@ -14,29 +13,9 @@ interface RouteParams {
   }>
 }
 
-async function createSupabaseClient() {
-  const cookieStore = await cookies()
-  return createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return cookieStore.getAll()
-        },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) => {
-            cookieStore.set(name, value, options)
-          })
-        },
-      },
-    }
-  )
-}
-
 export async function GET(request: NextRequest, { params }: RouteParams) {
   try {
-    const supabase = await createSupabaseClient()
+    const supabase = await createServerClient()
     const { userHandle, frameHandle } = await params
     
     // Get frame data
