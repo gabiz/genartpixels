@@ -18,10 +18,10 @@ interface UserStats {
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { userHandle: string } }
+  { params }: { params: Promise<{ userHandle: string }> }
 ) {
   try {
-    const { userHandle } = params
+    const { userHandle } = await params
 
     // Validate handle format
     if (!/^[a-zA-Z0-9_-]{5,20}$/.test(userHandle)) {

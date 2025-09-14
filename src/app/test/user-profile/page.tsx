@@ -34,10 +34,17 @@ const mockOwnedFrames = [
     width: 128,
     height: 128,
     created_at: '2024-01-01T00:00:00Z',
+    updated_at: '2024-01-01T00:00:00Z',
+    is_frozen: false,
+    keywords: ['test', 'demo'],
+    permissions: 'open' as const,
     stats: {
+      frame_id: 'frame-1',
       contributors_count: 3,
       total_pixels: 50,
       likes_count: 2,
+      last_activity: '2024-01-01T12:00:00Z',
+      updated_at: '2024-01-01T12:00:00Z'
     }
   },
   {
@@ -49,10 +56,17 @@ const mockOwnedFrames = [
     width: 256,
     height: 256,
     created_at: '2024-01-02T00:00:00Z',
+    updated_at: '2024-01-02T00:00:00Z',
+    is_frozen: false,
+    keywords: ['test', 'example'],
+    permissions: 'open' as const,
     stats: {
+      frame_id: 'frame-2',
       contributors_count: 5,
       total_pixels: 120,
       likes_count: 8,
+      last_activity: '2024-01-02T15:30:00Z',
+      updated_at: '2024-01-02T15:30:00Z'
     }
   },
 ]
@@ -65,10 +79,23 @@ const mockContributedFrames = [
       id: 'frame-3',
       handle: 'community-frame',
       title: 'Community Frame',
+      description: 'A community frame',
       owner_handle: 'other_user',
       width: 128,
       height: 128,
       created_at: '2024-01-01T00:00:00Z',
+      updated_at: '2024-01-01T00:00:00Z',
+      is_frozen: false,
+      keywords: ['community'],
+      permissions: 'open' as const,
+      stats: {
+        frame_id: 'frame-3',
+        contributors_count: 8,
+        total_pixels: 200,
+        likes_count: 15,
+        last_activity: '2024-01-01T10:00:00Z',
+        updated_at: '2024-01-01T10:00:00Z'
+      }
     },
   },
 ]

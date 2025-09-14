@@ -161,7 +161,7 @@ export function ReportButton({
               </div>
 
               <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-                You are reporting "{frameTitle}" by @{frameOwnerHandle}
+                You are reporting &quot;{frameTitle}&quot; by @{frameOwnerHandle}
               </p>
 
               <div className="space-y-4">

@@ -188,51 +188,51 @@ export function useErrorState() {
     setError(null)
   }, [])
 
-  const handleApiError = React.useCallback((error: any) => {
-    if (error?.code) {
+  const handleApiError = React.useCallback((error: unknown) => {
+    if (error && typeof error === 'object' && 'code' in error) {
       // Handle specific API error codes
-      switch (error.code) {
+      switch ((error as { code: string }).code) {
         case 'QUOTA_EXCEEDED':
           showError(
-            error.message || "You've exceeded your pixel quota",
+            (error as { message?: string }).message || "You've exceeded your pixel quota",
             { 
               title: 'Quota Exceeded',
               variant: 'warning',
-              details: error.details 
+              details: (error as { details?: string }).details 
             }
           )
           break
         case 'PERMISSION_DENIED':
           showError(
-            error.message || "You don't have permission to perform this action",
+            (error as { message?: string }).message || "You don't have permission to perform this action",
             { 
               title: 'Access Denied',
               variant: 'warning',
-              details: error.details 
+              details: (error as { details?: string }).details 
             }
           )
           break
         case 'INVALID_HANDLE':
           showError(
-            error.message || 'The handle you entered is invalid',
+            (error as { message?: string }).message || 'The handle you entered is invalid',
             { 
               title: 'Invalid Handle',
               variant: 'warning',
-              details: error.details 
+              details: (error as { details?: string }).details 
             }
           )
           break
         default:
           showError(
-            error.message || 'An unexpected error occurred',
+            (error as { message?: string }).message || 'An unexpected error occurred',
             { 
               title: 'Error',
-              details: error.details 
+              details: (error as { details?: string }).details 
             }
           )
       }
-    } else if (error?.message) {
-      showError(error.message, { details: error.stack })
+    } else if (error && typeof error === 'object' && 'message' in error) {
+      showError((error as { message: string; stack?: string }).message, { details: (error as { stack?: string }).stack })
     } else {
       showError('An unexpected error occurred')
     }

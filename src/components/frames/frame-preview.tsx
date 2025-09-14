@@ -126,7 +126,7 @@ export function FramePreview({ frame, className = '' }: FramePreviewProps) {
             <div className="flex flex-col items-end">
               <span className="text-xs">by @{frame.owner_handle}</span>
               <span className="text-xs">
-                {frame.stats.last_activity ? formatTimeAgo(frame.stats.last_activity) : formatTimeAgo(frame.created_at)}
+                {frame.stats.last_activity ? formatTimeAgo(frame.stats.last_activity) : (frame.created_at ? formatTimeAgo(frame.created_at) : 'Unknown time')}
               </span>
             </div>
           </div>

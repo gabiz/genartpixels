@@ -44,7 +44,7 @@ export const getTestEnvironmentInfo = () => ({
 })
 
 // Mock data generators for consistent testing
-export const createMockUser = (overrides: Partial<any> = {}) => ({
+export const createMockUser = (overrides: Partial<Record<string, unknown>> = {}) => ({
   id: 'test-user-id',
   handle: 'testuser',
   email: 'test@example.com',
@@ -54,7 +54,7 @@ export const createMockUser = (overrides: Partial<any> = {}) => ({
   ...overrides
 })
 
-export const createMockFrame = (overrides: Partial<any> = {}) => ({
+export const createMockFrame = (overrides: Partial<Record<string, unknown>> = {}) => ({
   id: 'test-frame-id',
   handle: 'test-frame',
   title: 'Test Frame',
@@ -70,7 +70,7 @@ export const createMockFrame = (overrides: Partial<any> = {}) => ({
   ...overrides
 })
 
-export const createMockPixel = (overrides: Partial<any> = {}) => ({
+export const createMockPixel = (overrides: Partial<Record<string, unknown>> = {}) => ({
   id: 'test-pixel-id',
   frame_id: 'test-frame-id',
   x: 0,

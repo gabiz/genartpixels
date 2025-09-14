@@ -130,7 +130,7 @@ export function useErrorHandling(options: ErrorHandlingOptions = {}) {
   const handleApiResponse = useCallback(async (
     response: Response,
     errorContext?: string
-  ): Promise<any> => {
+  ): Promise<unknown> => {
     if (!response.ok) {
       let errorData
       try {
@@ -159,7 +159,7 @@ export function useErrorHandling(options: ErrorHandlingOptions = {}) {
     url: string,
     options: RequestInit = {},
     errorContext?: string
-  ): Promise<any> => {
+  ): Promise<unknown> => {
     return executeWithErrorHandling(async () => {
       const response = await fetch(url, options)
       return handleApiResponse(response, errorContext)
@@ -169,18 +169,19 @@ export function useErrorHandling(options: ErrorHandlingOptions = {}) {
   /**
    * Handle form submission errors
    */
-  const handleFormError = useCallback((error: any, fieldName?: string) => {
-    if (error?.code === 'VALIDATION_ERROR' && error?.field) {
+  const handleFormError = useCallback((error: unknown, fieldName?: string) => {
+    const typedError = error as { code?: string; field?: string; message?: string }
+    if (typedError?.code === 'VALIDATION_ERROR' && typedError?.field) {
       showError(
-        error.message || 'Validation failed',
+        typedError.message || 'Validation failed',
         {
-          title: `Invalid ${error.field}`,
+          title: `Invalid ${typedError.field}`,
           variant: 'warning'
         }
       )
-    } else if (fieldName && error?.message) {
+    } else if (fieldName && typedError?.message) {
       showError(
-        error.message,
+        typedError.message,
         {
           title: `Error in ${fieldName}`,
           variant: 'warning'
@@ -194,9 +195,10 @@ export function useErrorHandling(options: ErrorHandlingOptions = {}) {
   /**
    * Validate and handle quota errors specifically
    */
-  const handleQuotaError = useCallback((error: any) => {
-    if (error?.code === 'QUOTA_EXCEEDED') {
-      const remainingTime = error?.remainingTime
+  const handleQuotaError = useCallback((error: unknown) => {
+    const typedError = error as { code?: string; remainingTime?: number }
+    if (typedError?.code === 'QUOTA_EXCEEDED') {
+      const remainingTime = typedError?.remainingTime
       const message = remainingTime 
         ? `You've used all your pixels. Next refill in ${Math.ceil(remainingTime / 60)} minutes.`
         : "You've used all your pixels. Please wait for your quota to refill."
@@ -213,10 +215,11 @@ export function useErrorHandling(options: ErrorHandlingOptions = {}) {
   /**
    * Handle permission errors
    */
-  const handlePermissionError = useCallback((error: any) => {
-    if (error?.code === 'PERMISSION_DENIED') {
+  const handlePermissionError = useCallback((error: unknown) => {
+    const typedError = error as { code?: string; message?: string }
+    if (typedError?.code === 'PERMISSION_DENIED') {
       showError(
-        error.message || "You don't have permission to perform this action.",
+        typedError.message || "You don't have permission to perform this action.",
         {
           title: 'Access Denied',
           variant: 'warning'

@@ -9,7 +9,6 @@ import React from 'react'
 import { useAuth } from '@/lib/auth/context'
 import { HandleSelection } from '@/components/user/handle-selection'
 import { LoadingSpinner } from '@/components/ui/loading-spinner'
-import { AuthSuccess } from './auth-success'
 
 interface HandleRequiredProps {
   children: React.ReactNode

@@ -80,7 +80,7 @@ export function FrameManagementDemo() {
               <p><strong>Contributors:</strong> {currentFrame.stats.contributors_count}</p>
               <p><strong>Total Pixels:</strong> {currentFrame.stats.total_pixels}</p>
               <p><strong>Likes:</strong> {currentFrame.stats.likes_count}</p>
-              <p><strong>Created:</strong> {new Date(currentFrame.created_at).toLocaleDateString()}</p>
+              <p><strong>Created:</strong> {currentFrame.created_at ? new Date(currentFrame.created_at).toLocaleDateString() : 'Unknown date'}</p>
             </div>
           </div>
         </div>

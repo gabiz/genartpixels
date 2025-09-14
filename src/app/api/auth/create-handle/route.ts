@@ -5,11 +5,8 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@/lib/supabase/serverClient'
-// import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
-import { cookies } from 'next/headers'
 import { validateHandle, VALIDATION_MESSAGES } from '@/lib/validation'
 import type { HandleCreationRequest, HandleCreationResponse } from '@/lib/auth/types'
-import { createServer } from 'http'
 
 export async function POST(request: NextRequest) {
   console.log("create handle called")
@@ -33,7 +30,7 @@ export async function POST(request: NextRequest) {
     )
 
     // Try to get session from cookies first
-    let { data: { session }, error: sessionError } = await supabase.auth.getSession()
+    let { data: { session } } = await supabase.auth.getSession()
     let user = session?.user
 
     // If no session from cookies, try Authorization header
@@ -44,7 +41,7 @@ export async function POST(request: NextRequest) {
         const { data: { user: tokenUser }, error: tokenError } = await supabase.auth.getUser(token)
         if (!tokenError && tokenUser) {
           user = tokenUser
-          session = { access_token: token, user: tokenUser } as any
+          session = { access_token: token, user: tokenUser, refresh_token: '', expires_in: 0, token_type: 'bearer' }
         }
       }
     }

@@ -73,7 +73,7 @@ export default function SocialFeaturesTestPage() {
                 frameOwnerHandle={mockFrame.owner_handle}
                 frameHandle={mockFrame.handle}
                 initialLiked={false}
-                initialLikesCount={mockFrame.stats.likes_count}
+                initialLikesCount={mockFrame.stats.likes_count || 0}
                 size="sm"
               />
               <ReportButton
@@ -90,7 +90,7 @@ export default function SocialFeaturesTestPage() {
                 frameOwnerHandle={mockFrame.owner_handle}
                 frameHandle={mockFrame.handle}
                 initialLiked={true}
-                initialLikesCount={mockFrame.stats.likes_count}
+                initialLikesCount={mockFrame.stats.likes_count || 0}
                 size="md"
               />
               <ReportButton
@@ -107,7 +107,7 @@ export default function SocialFeaturesTestPage() {
                 frameOwnerHandle={mockFrame.owner_handle}
                 frameHandle={mockFrame.handle}
                 initialLiked={false}
-                initialLikesCount={mockFrame.stats.likes_count}
+                initialLikesCount={mockFrame.stats.likes_count || 0}
                 size="lg"
               />
               <ReportButton
@@ -174,19 +174,22 @@ export default function SocialFeaturesTestPage() {
             </div>
 
             {showPixelTooltip && (
-              <PixelInfoTooltip
-                frameOwnerHandle={mockFrame.owner_handle}
-                frameHandle={mockFrame.handle}
-                x={62}
-                y={32}
-                visible={showPixelTooltip}
-                onClose={() => setShowPixelTooltip(false)}
+              <div 
                 className="absolute"
                 style={{
                   left: tooltipPosition.x,
                   top: tooltipPosition.y
                 }}
-              />
+              >
+                <PixelInfoTooltip
+                  frameOwnerHandle={mockFrame.owner_handle}
+                  frameHandle={mockFrame.handle}
+                  x={62}
+                  y={32}
+                  visible={showPixelTooltip}
+                  onClose={() => setShowPixelTooltip(false)}
+                />
+              </div>
             )}
           </div>
         </div>

@@ -96,7 +96,7 @@ export function FrameStats({
     {
       key: 'activity',
       label: 'Last Activity',
-      value: frame.stats.last_activity ? formatTimeAgo(frame.stats.last_activity) : formatTimeAgo(frame.created_at),
+      value: frame.stats.last_activity ? formatTimeAgo(frame.stats.last_activity) : (frame.created_at ? formatTimeAgo(frame.created_at) : 'Unknown'),
       icon: (
         <svg className={sizeClasses[size].icon} fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -172,21 +172,21 @@ export function DetailedFrameStats({ frame, className = '' }: { frame: FrameWith
       <div className="grid grid-cols-2 gap-4">
         <div className="text-center">
           <div className="text-2xl font-bold text-red-500">
-            {formatNumber(frame.stats.likes_count)}
+            {formatNumber(frame.stats.likes_count || 0)}
           </div>
           <div className="text-sm text-gray-600 dark:text-gray-400">Likes</div>
         </div>
         
         <div className="text-center">
           <div className="text-2xl font-bold text-blue-500">
-            {formatNumber(frame.stats.contributors_count)}
+            {formatNumber(frame.stats.contributors_count || 0)}
           </div>
           <div className="text-sm text-gray-600 dark:text-gray-400">Contributors</div>
         </div>
         
         <div className="text-center">
           <div className="text-2xl font-bold text-green-500">
-            {formatNumber(frame.stats.total_pixels)}
+            {formatNumber(frame.stats.total_pixels || 0)}
           </div>
           <div className="text-sm text-gray-600 dark:text-gray-400">Pixels Placed</div>
         </div>
@@ -201,7 +201,7 @@ export function DetailedFrameStats({ frame, className = '' }: { frame: FrameWith
 
       <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
         <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400">
-          <span>Created: {new Date(frame.created_at).toLocaleDateString()}</span>
+          <span>Created: {frame.created_at ? new Date(frame.created_at).toLocaleDateString() : 'Unknown'}</span>
           <span>
             Last activity: {frame.stats.last_activity ? formatTimeAgo(frame.stats.last_activity) : 'None'}
           </span>

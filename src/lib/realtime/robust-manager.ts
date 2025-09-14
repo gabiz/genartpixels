@@ -251,7 +251,7 @@ export class RobustRealtimeManager {
     }, 5000)
 
     // Store the interval so we can clean it up
-    this.retryTimers.set(`poll-${frameId}`, pollInterval as any)
+    this.retryTimers.set(`poll-${frameId}`, pollInterval as NodeJS.Timeout)
   }
 }
 

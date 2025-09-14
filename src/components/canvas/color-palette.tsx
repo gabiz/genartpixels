@@ -135,7 +135,7 @@ export function ColorPalette({
       
       {/* Responsive grid layout for 32 colors */}
       <div 
-        ref={gridRef}
+        ref={gridRef as React.RefObject<HTMLDivElement>}
         className={`
           grid gap-2 p-3 bg-muted/30 rounded-lg border
           ${isMobile ? 'grid-cols-6 gap-3' : 'grid-cols-8'}

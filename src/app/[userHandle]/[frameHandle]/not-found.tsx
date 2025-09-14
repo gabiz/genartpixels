@@ -30,7 +30,7 @@ export default function FrameNotFound() {
         </h1>
         
         <p className="text-lg text-gray-600 dark:text-gray-400 mb-8 max-w-md mx-auto">
-          The frame you're looking for doesn't exist, has been deleted, or you don't have permission to view it.
+          The frame you&apos;re looking for doesn&apos;t exist, has been deleted, or you don&apos;t have permission to view it.
         </p>
         
         <div className="space-y-4">

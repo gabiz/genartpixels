@@ -121,8 +121,15 @@ export function useFrameBroadcast() {
       const manager = getRealtimeManager()
       const response = await manager.broadcastFrameEvent(event)
       
-      if (response.status !== 'ok') {
-        throw new Error(`Broadcast failed with status: ${response.status}`)
+      if (response === 'error') {
+        throw new Error('Broadcast failed with error')
+      }
+      
+      if (typeof response === 'object' && response !== null && 'status' in response) {
+        const statusResponse = response as { status: string }
+        if (statusResponse.status !== 'ok') {
+          throw new Error(`Broadcast failed with status: ${statusResponse.status}`)
+        }
       }
     } catch (error) {
       const err = error instanceof Error ? error : new Error(String(error))

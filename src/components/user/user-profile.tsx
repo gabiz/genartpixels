@@ -12,6 +12,7 @@ import { formatDistanceToNow } from 'date-fns'
 import { useAuth } from '@/lib/auth/context'
 import { FramePreview } from '@/components/frames/frame-preview'
 import type { User } from '@/lib/auth/types'
+import type { FrameWithStats } from '@/lib/types'
 
 interface UserWithStats extends User {
   frames_created: number
@@ -38,12 +39,12 @@ interface Frame {
 interface ContributedFrame {
   frame_id: string
   last_contribution: string
-  frame: Frame
+  frame: FrameWithStats
 }
 
 interface UserProfileProps {
   user: UserWithStats
-  ownedFrames: Frame[]
+  ownedFrames: FrameWithStats[]
   contributedFrames: ContributedFrame[]
 }
 
@@ -143,7 +144,6 @@ export function UserProfile({ user, ownedFrames, contributedFrames }: UserProfil
               <FramePreview
                 key={frame.id}
                 frame={frame}
-                showOwner={false}
               />
             ))}
           </div>
@@ -191,7 +191,6 @@ export function UserProfile({ user, ownedFrames, contributedFrames }: UserProfil
               <div key={contribution.frame_id} className="relative">
                 <FramePreview
                   frame={contribution.frame}
-                  showOwner={true}
                 />
                 <div className="mt-2 text-xs text-gray-500">
                   Last contributed {formatDistanceToNow(new Date(contribution.last_contribution), { addSuffix: true })}

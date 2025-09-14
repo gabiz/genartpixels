@@ -65,32 +65,32 @@ export function sortFrames(
         bValue = b.title.toLowerCase()
         break
       case 'created_at':
-        aValue = new Date(a.created_at).getTime()
-        bValue = new Date(b.created_at).getTime()
+        aValue = a.created_at ? new Date(a.created_at).getTime() : 0
+        bValue = b.created_at ? new Date(b.created_at).getTime() : 0
         break
       case 'updated_at':
-        aValue = new Date(a.updated_at).getTime()
-        bValue = new Date(b.updated_at).getTime()
+        aValue = a.updated_at ? new Date(a.updated_at).getTime() : 0
+        bValue = b.updated_at ? new Date(b.updated_at).getTime() : 0
         break
       case 'last_activity':
         aValue = a.stats.last_activity ? new Date(a.stats.last_activity).getTime() : 0
         bValue = b.stats.last_activity ? new Date(b.stats.last_activity).getTime() : 0
         break
       case 'total_pixels':
-        aValue = a.stats.total_pixels
-        bValue = b.stats.total_pixels
+        aValue = a.stats.total_pixels || 0
+        bValue = b.stats.total_pixels || 0
         break
       case 'contributors_count':
-        aValue = a.stats.contributors_count
-        bValue = b.stats.contributors_count
+        aValue = a.stats.contributors_count || 0
+        bValue = b.stats.contributors_count || 0
         break
       case 'likes_count':
-        aValue = a.stats.likes_count
-        bValue = b.stats.likes_count
+        aValue = a.stats.likes_count || 0
+        bValue = b.stats.likes_count || 0
         break
       default:
-        aValue = new Date(a.created_at).getTime()
-        bValue = new Date(b.created_at).getTime()
+        aValue = a.created_at ? new Date(a.created_at).getTime() : 0
+        bValue = b.created_at ? new Date(b.created_at).getTime() : 0
     }
 
     if (aValue < bValue) {

@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import { COLOR_PALETTE, FRAME_SIZES } from '@/lib/types'
 import { ColorUtils, getPaletteByFamilies } from '@/lib/utils/color-utils'
 import { validateHandle, validateColor } from '@/lib/validation'
@@ -16,24 +17,24 @@ export default function TestPage() {
         <section>
           <h2 className="text-2xl font-semibold mb-4">Test Pages</h2>
           <div className="flex flex-wrap gap-4">
-            <a 
+            <Link 
               href="/test/auth" 
               className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
             >
               Authentication Test
-            </a>
-            <a 
+            </Link>
+            <Link 
               href="/test/frames" 
               className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
             >
               Frames Test
-            </a>
-            <a 
+            </Link>
+            <Link 
               href="/test/pixels" 
               className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700"
             >
               Pixel Placement Test
-            </a>
+            </Link>
           </div>
         </section>
         

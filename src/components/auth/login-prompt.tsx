@@ -6,6 +6,7 @@
  */
 
 import React from 'react'
+import Link from 'next/link'
 import { useAuth } from '@/lib/auth/context'
 import { Button } from '@/components/ui/button'
 import { Alert, AlertDescription, AlertCircleIcon } from '@/components/ui/alert'
@@ -111,19 +112,19 @@ export function LoginPrompt() {
           <div className="text-center">
             <p className="text-xs text-muted-foreground leading-relaxed">
               By signing in, you agree to our{' '}
-              <a 
+              <Link 
                 href="/terms" 
                 className="underline underline-offset-4 hover:text-primary transition-colors"
               >
                 terms of service
-              </a>{' '}
+              </Link>{' '}
               and{' '}
-              <a 
+              <Link 
                 href="/privacy" 
                 className="underline underline-offset-4 hover:text-primary transition-colors"
               >
                 privacy policy
-              </a>
+              </Link>
               .
             </p>
           </div>

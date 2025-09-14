@@ -174,7 +174,7 @@ export function validateColor(color: number): ValidationResult {
 /**
  * Enhanced form validation with multiple fields
  */
-export function validateForm<T extends Record<string, any>>(
+export function validateForm<T extends Record<string, unknown>>(
   data: T,
   rules: Record<keyof T, ValidationRule<T[keyof T]>[]>
 ): {
@@ -255,7 +255,7 @@ export const ValidationRules = {
 /**
  * Real-time validation hook for forms
  */
-export function useFormValidation<T extends Record<string, any>>(
+export function useFormValidation<T extends Record<string, unknown>>(
   initialData: T,
   rules: Record<keyof T, ValidationRule<T[keyof T]>[]>
 ) {

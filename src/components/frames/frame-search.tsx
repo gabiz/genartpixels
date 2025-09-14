@@ -19,15 +19,6 @@ export function FrameSearch({ onSearchChange, onSortChange, className = '' }: Fr
     (searchParams.get('sortOrder') as 'asc' | 'desc') || 'desc'
   )
 
-  // Debounced search function
-  const debouncedSearch = useCallback(
-    debounce((searchTerm: string) => {
-      onSearchChange?.(searchTerm)
-      updateURL({ search: searchTerm })
-    }, 300),
-    [onSearchChange]
-  )
-
   // Update URL with new parameters
   const updateURL = useCallback((params: Record<string, string>) => {
     const current = new URLSearchParams(Array.from(searchParams.entries()))
@@ -44,6 +35,15 @@ export function FrameSearch({ onSearchChange, onSortChange, className = '' }: Fr
     const query = search ? `?${search}` : ''
     router.push(`/${query}`)
   }, [router, searchParams])
+
+  // Debounced search function
+  const debouncedSearch = useCallback(
+    debounce((searchTerm: string) => {
+      onSearchChange?.(searchTerm)
+      updateURL({ search: searchTerm })
+    }, 300),
+    [onSearchChange, updateURL]
+  )
 
   // Handle search input change
   const handleSearchChange = (value: string) => {
@@ -146,16 +146,16 @@ export function FrameSearch({ onSearchChange, onSortChange, className = '' }: Fr
 }
 
 // Debounce utility function
-function debounce<T extends (...args: unknown[]) => unknown>(
-  func: T,
+function debounce(
+  func: (searchTerm: string) => void,
   wait: number
-): (...args: Parameters<T>) => void {
+): (searchTerm: string) => void {
   let timeout: NodeJS.Timeout | null = null
   
-  return (...args: Parameters<T>): void => {
+  return (searchTerm: string): void => {
     if (timeout) {
       clearTimeout(timeout)
     }
-    timeout = setTimeout(() => func(...args), wait)
+    timeout = setTimeout(() => func(searchTerm), wait)
   }
 }

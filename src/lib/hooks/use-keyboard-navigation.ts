@@ -63,7 +63,7 @@ export function useScreenReaderAnnouncement() {
  */
 export function useRovingTabindex(itemSelector: string, isActive: boolean = true) {
   const containerRef = useRef<HTMLElement>(null)
-  const managerRef = useRef<any>(null)
+  const managerRef = useRef<{ destroy: () => void } | null>(null)
 
   useEffect(() => {
     if (!isActive || !containerRef.current) return

@@ -84,7 +84,7 @@ export default function FrameViewerTestPage() {
               </label>
               <select
                 value={framePermissions}
-                onChange={(e) => setFramePermissions(e.target.value as any)}
+                onChange={(e) => setFramePermissions(e.target.value as 'open' | 'approval-required' | 'owner-only')}
                 className="px-3 py-1 border border-gray-300 rounded-md text-sm"
               >
                 <option value="open">Open</option>

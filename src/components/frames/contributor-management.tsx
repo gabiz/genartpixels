@@ -263,7 +263,7 @@ export function ContributorManagement({ frame, onClose }: ContributorManagementP
                   <div>
                     <div className="font-medium text-gray-900">@{permission.user_handle}</div>
                     <div className="text-sm text-gray-500">
-                      Requested access on {new Date(permission.created_at).toLocaleDateString()}
+                      Requested access on {permission.created_at ? new Date(permission.created_at).toLocaleDateString() : 'Unknown date'}
                     </div>
                   </div>
                   <div className="flex space-x-2">
@@ -302,7 +302,7 @@ export function ContributorManagement({ frame, onClose }: ContributorManagementP
                   <div>
                     <div className="font-medium text-gray-900">@{permission.user_handle}</div>
                     <div className="text-sm text-gray-500">
-                      Added on {new Date(permission.created_at).toLocaleDateString()}
+                      Added on {permission.created_at ? new Date(permission.created_at).toLocaleDateString() : 'Unknown date'}
                     </div>
                   </div>
                   <div className="flex space-x-2">
@@ -339,7 +339,7 @@ export function ContributorManagement({ frame, onClose }: ContributorManagementP
                   <div>
                     <div className="font-medium text-gray-900">@{permission.user_handle}</div>
                     <div className="text-sm text-gray-500">
-                      Blocked on {new Date(permission.created_at).toLocaleDateString()}
+                      Blocked on {permission.created_at ? new Date(permission.created_at).toLocaleDateString() : 'Unknown date'}
                     </div>
                   </div>
                   <div className="flex space-x-2">

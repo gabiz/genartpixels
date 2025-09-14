@@ -141,14 +141,15 @@ export function PixelEditor({
         refreshUser()
       } else {
         // Handle errors
-        if (result.code === 'QUOTA_EXCEEDED') {
+        const errorMessage = result.error || 'Failed to place pixel'
+        if (errorMessage.includes('quota') || errorMessage.includes('pixels remaining')) {
           feedback.showError('No pixels remaining! Wait for refill.')
-        } else if (result.code === 'FRAME_FROZEN') {
+        } else if (errorMessage.includes('frozen')) {
           feedback.showError('This frame is frozen')
-        } else if (result.code === 'PERMISSION_DENIED') {
+        } else if (errorMessage.includes('permission')) {
           feedback.showError('You don\'t have permission to edit this frame')
         } else {
-          feedback.showError(result.error || 'Failed to place pixel')
+          feedback.showError(errorMessage)
         }
       }
     } catch (error) {

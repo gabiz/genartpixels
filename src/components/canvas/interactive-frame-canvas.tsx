@@ -148,13 +148,7 @@ export function InteractiveFrameCanvas({
       />
       
       {enablePixelInfo && tooltipState.visible && (
-        <PixelInfoTooltip
-          frameOwnerHandle={frameOwnerHandle}
-          frameHandle={frameHandle}
-          x={tooltipState.pixelX}
-          y={tooltipState.pixelY}
-          visible={tooltipState.visible}
-          onClose={handleTooltipClose}
+        <div 
           className="pointer-events-none"
           style={{
             position: 'absolute',
@@ -162,7 +156,16 @@ export function InteractiveFrameCanvas({
             top: tooltipState.y,
             zIndex: 50
           }}
-        />
+        >
+          <PixelInfoTooltip
+            frameOwnerHandle={frameOwnerHandle}
+            frameHandle={frameHandle}
+            x={tooltipState.pixelX}
+            y={tooltipState.pixelY}
+            visible={tooltipState.visible}
+            onClose={handleTooltipClose}
+          />
+        </div>
       )}
     </div>
   )

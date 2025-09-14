@@ -197,7 +197,7 @@ export async function GET(request: NextRequest) {
         })
       }
 
-      const usersWithRank: LeaderboardUser[] = (userStats || []).map((user: any, index: number) => ({
+      const usersWithRank: LeaderboardUser[] = (userStats || []).map((user: Record<string, unknown>, index: number) => ({
         handle: user.handle,
         frames_created: user.frames_created || 0,
         frames_contributed_to: user.frames_contributed_to || 0,

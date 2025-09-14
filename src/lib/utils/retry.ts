@@ -7,7 +7,7 @@ export interface RetryOptions {
   baseDelay?: number
   maxDelay?: number
   backoffFactor?: number
-  shouldRetry?: (error: any, attempt: number) => boolean
+  shouldRetry?: (error: unknown, attempt: number) => boolean
 }
 
 export class RetryError extends Error {
@@ -74,19 +74,21 @@ export async function withRetry<T>(
 /**
  * Default retry logic - retry on network errors but not on client errors
  */
-function defaultShouldRetry(error: any, attempt: number): boolean {
+function defaultShouldRetry(error: unknown, attempt: number): boolean {
+  const typedError = error as { status?: number; code?: string }
+  
   // Don't retry client errors (4xx)
-  if (error?.status >= 400 && error?.status < 500) {
+  if (typedError?.status && typedError.status >= 400 && typedError.status < 500) {
     return false
   }
   
   // Don't retry validation errors
-  if (error?.code === 'VALIDATION_ERROR') {
+  if (typedError?.code === 'VALIDATION_ERROR') {
     return false
   }
   
   // Don't retry permission errors
-  if (error?.code === 'PERMISSION_DENIED') {
+  if (typedError?.code === 'PERMISSION_DENIED') {
     return false
   }
   
@@ -115,8 +117,8 @@ export async function fetchWithRetry(
     // Throw error for non-ok responses to trigger retry logic
     if (!response.ok) {
       const error = new Error(`HTTP ${response.status}: ${response.statusText}`)
-      ;(error as any).status = response.status
-      ;(error as any).response = response
+      ;(error as Error & { status: number; response: Response }).status = response.status
+      ;(error as Error & { status: number; response: Response }).response = response
       throw error
     }
     
@@ -124,10 +126,11 @@ export async function fetchWithRetry(
   }, {
     shouldRetry: (error, attempt) => {
       // Custom retry logic for HTTP requests
-      const status = error?.status
+      const typedError = error as { status?: number }
+      const status = typedError?.status
       
       // Don't retry client errors (4xx) except for 408, 429
-      if (status >= 400 && status < 500 && status !== 408 && status !== 429) {
+      if (status && status >= 400 && status < 500 && status !== 408 && status !== 429) {
         return false
       }
       

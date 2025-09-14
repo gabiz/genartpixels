@@ -1,14 +1,11 @@
-/**
- * Authentication page for Gen Art Pixels
- * Provides OAuth sign in options for users
- */
-
 'use client'
 
+import { Suspense } from 'react'
 import { LoginPrompt } from '@/components/auth/login-prompt'
 import { useSearchParams } from 'next/navigation'
+import { LoadingSpinner } from '@/components/ui/loading-spinner'
 
-export default function AuthPage() {
+function AuthContent() {
   const searchParams = useSearchParams()
   const redirectTo = searchParams.get('redirect') || '/'
 
@@ -36,5 +33,13 @@ export default function AuthPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function AuthPage() {
+  return (
+    <Suspense fallback={<LoadingSpinner size="lg" />}>
+      <AuthContent />
+    </Suspense>
   )
 }

@@ -215,7 +215,7 @@ export function FrameSettingsPanel({ frame, onFrameUpdated, onClose }: FrameSett
             </div>
             <div className="text-center p-3 bg-gray-50 rounded-lg">
               <div className="text-sm font-medium text-gray-900">
-                {new Date(frame.created_at).toLocaleDateString()}
+                {frame.created_at ? new Date(frame.created_at).toLocaleDateString() : 'Unknown'}
               </div>
               <div className="text-sm text-gray-500">Created</div>
             </div>

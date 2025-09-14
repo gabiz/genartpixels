@@ -9,6 +9,7 @@ import { notFound } from 'next/navigation'
 import { createServerClient } from '@/lib/supabase/serverClient'
 import { UserProfile } from '@/components/user/user-profile'
 import type { User } from '@/lib/auth/types'
+import type { FrameWithStats } from '@/lib/types'
 
 interface UserProfilePageProps {
   params: {
@@ -115,10 +116,23 @@ async function getUserFrames(userHandle: string) {
         id,
         handle,
         title,
+        description,
         owner_handle,
         width,
         height,
-        created_at
+        created_at,
+        updated_at,
+        is_frozen,
+        keywords,
+        permissions,
+        frame_stats!inner(
+          frame_id,
+          contributors_count,
+          total_pixels,
+          likes_count,
+          last_activity,
+          updated_at
+        )
       )
     `)
     .eq('contributor_handle', userHandle)
@@ -129,14 +143,20 @@ async function getUserFrames(userHandle: string) {
   const uniqueContributedFrames = contributedFrames?.reduce((acc, pixel) => {
     const frameId = pixel.frame_id
     if (!acc.find(item => item.frame_id === frameId)) {
+      const frameData = Array.isArray(pixel.frames) ? pixel.frames[0] : pixel.frames
+      const statsData = Array.isArray(frameData.frame_stats) ? frameData.frame_stats[0] : frameData.frame_stats
+      
       acc.push({
         frame_id: frameId,
         last_contribution: pixel.placed_at,
-        frame: pixel.frames,
+        frame: {
+          ...frameData,
+          stats: statsData,
+        },
       })
     }
     return acc
-  }, [] as any[])
+  }, [] as Array<{ frame_id: string; last_contribution: string; frame: FrameWithStats }>)
 
   return {
     ownedFrames: ownedFrames ? ownedFrames.map(({ contributors_count, total_pixels, likes_count, last_activity, ...rest }) => ({

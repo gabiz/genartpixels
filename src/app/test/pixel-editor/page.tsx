@@ -141,10 +141,10 @@ export default function PixelEditorTestPage() {
             <div className="space-y-2 text-blue-800">
               <p><strong>Color Palette:</strong> Click colors to select them. Selected color is highlighted.</p>
               <p><strong>Canvas Interaction:</strong> Click on the canvas to place pixels (requires login).</p>
-              <p><strong>Grid Toggle:</strong> Use the "Show/Hide Grid" button to toggle pixel grid visibility.</p>
-              <p><strong>Zoom Controls:</strong> Use mouse wheel to zoom, drag to pan, "Fit to Frame" to reset view.</p>
+              <p><strong>Grid Toggle:</strong> Use the &quot;Show/Hide Grid&quot; button to toggle pixel grid visibility.</p>
+              <p><strong>Zoom Controls:</strong> Use mouse wheel to zoom, drag to pan, &quot;Fit to Frame&quot; to reset view.</p>
               <p><strong>Quota System:</strong> Monitor your pixel quota in the right panel.</p>
-              <p><strong>Undo:</strong> Use "Undo Last Pixel" button to remove your most recent pixel.</p>
+              <p><strong>Undo:</strong> Use &quot;Undo Last Pixel&quot; button to remove your most recent pixel.</p>
               <p><strong>Feedback:</strong> Watch for visual feedback messages when placing pixels.</p>
             </div>
           </div>

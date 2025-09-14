@@ -41,7 +41,7 @@ export function AuthSuccess() {
           </div>
           <CardTitle className="text-green-800">Welcome to Gen Art Pixels!</CardTitle>
           <CardDescription>
-            You've successfully signed in. Ready to start creating pixel art?
+            You&apos;ve successfully signed in. Ready to start creating pixel art?
           </CardDescription>
         </CardHeader>
         <CardContent className="text-center">
@@ -49,7 +49,7 @@ export function AuthSuccess() {
             Continue to Frame
           </Button>
           <p className="text-xs text-gray-500 mt-2">
-            You'll be taken back to where you started
+            You&apos;ll be taken back to where you started
           </p>
         </CardContent>
       </Card>

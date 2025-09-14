@@ -15,9 +15,7 @@ interface UserSettingsProps {
   user: User
 }
 
-interface ProfileUpdateData {
-  avatar_url?: string
-}
+
 
 export function UserSettings({ user: initialUser }: UserSettingsProps) {
   const { refreshUser, signOut } = useAuth()
@@ -120,7 +118,7 @@ export function UserSettings({ user: initialUser }: UserSettingsProps) {
               <span className="text-gray-900 font-medium">{user.handle}</span>
             </div>
             <p className="mt-2 text-sm text-gray-500">
-              Your handle cannot be changed after creation. It's your permanent identifier on Gen Art Pixels.
+              Your handle cannot be changed after creation. It&apos;s your permanent identifier on Gen Art Pixels.
             </p>
           </div>
 

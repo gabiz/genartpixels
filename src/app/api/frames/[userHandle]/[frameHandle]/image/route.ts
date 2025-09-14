@@ -55,7 +55,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       pixels || []
     )
 
-    return new NextResponse(imageBuffer, {
+    return new NextResponse(imageBuffer as BodyInit, {
       headers: {
         'Content-Type': 'image/png',
         'Cache-Control': 'public, max-age=300', // Cache for 5 minutes
@@ -104,14 +104,14 @@ function createCanvas(width: number, height: number) {
   // Simplified canvas implementation for demonstration
   // In a real implementation, you'd use the 'canvas' npm package
   return {
-    getContext: () => ({
+    getContext: (type: string) => ({
       fillStyle: '',
       strokeStyle: '',
       lineWidth: 0,
-      fillRect: () => {},
-      strokeRect: () => {},
+      fillRect: (x: number, y: number, w: number, h: number) => {},
+      strokeRect: (x: number, y: number, w: number, h: number) => {},
     }),
-    toBuffer: () => Buffer.from('placeholder-image-data')
+    toBuffer: (format: string) => Buffer.from('placeholder-image-data')
   }
 }
 

@@ -182,7 +182,7 @@ export function FrameViewer({
       ...prev,
       stats: {
         ...prev.stats,
-        total_pixels: prev.stats.total_pixels + 1,
+        total_pixels: (prev.stats.total_pixels || 0) + 1,
         last_activity: new Date().toISOString()
       }
     }))
@@ -190,6 +190,12 @@ export function FrameViewer({
 
   const handlePixelPlaced = useCallback((pixel: Pixel) => {
     handlePixelUpdate(pixel)
+  }, [])
+
+  const handlePixelClick = useCallback((x: number, y: number) => {
+    // This would typically trigger the pixel editor or placement logic
+    // For now, we'll just log the coordinates
+    console.log('Pixel clicked at:', x, y)
   }, [])
 
   const handlePixelUndone = useCallback((x: number, y: number) => {
@@ -203,7 +209,7 @@ export function FrameViewer({
       ...prev,
       stats: {
         ...prev.stats,
-        total_pixels: Math.max(0, prev.stats.total_pixels - 1),
+        total_pixels: Math.max(0, (prev.stats.total_pixels || 0) - 1),
         last_activity: new Date().toISOString()
       }
     }))
@@ -293,7 +299,7 @@ export function FrameViewer({
               <LikeButton
                 frameOwnerHandle={frameOwnerHandle}
                 frameHandle={frameHandle}
-                initialLikesCount={frame.stats.likes_count}
+                initialLikesCount={frame.stats.likes_count || 0}
                 size={state.isMobile ? 'sm' : 'md'}
               />
               
@@ -532,7 +538,7 @@ export function FrameViewer({
                 frameHandle={frameHandle}
                 showGrid={true}
                 className="w-full h-64"
-                onPixelClick={canEdit && state.showPixelEditor ? handlePixelPlaced : undefined}
+                onPixelClick={canEdit && state.showPixelEditor ? handlePixelClick : undefined}
               />
             </div>
 

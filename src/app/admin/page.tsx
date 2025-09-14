@@ -18,7 +18,7 @@ const TABLES: TableName[] = [
 ];
 
 interface TableData {
-  [key: string]: any[];
+  [key: string]: Record<string, unknown>[];
 }
 
 export default function AdminPage() {
@@ -91,7 +91,7 @@ export default function AdminPage() {
     loadAllTables();
   }, []);
 
-  const formatValue = (value: any): string => {
+  const formatValue = (value: unknown): string => {
     if (value === null) return 'NULL';
     if (value === undefined) return 'undefined';
     if (typeof value === 'object') return JSON.stringify(value);

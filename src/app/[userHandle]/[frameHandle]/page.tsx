@@ -5,9 +5,7 @@
 
 import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
-import { cookies } from 'next/headers'
 import { createServerClient } from '@/lib/supabase/serverClient'
-import type { Database } from '@/lib/supabase/database.types'
 import { FrameViewer } from '@/components/frames/frame-viewer'
 import type { FrameWithStats, FramePermission } from '@/lib/types'
 

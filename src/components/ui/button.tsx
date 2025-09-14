@@ -30,7 +30,8 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       if (event.key === 'Enter' || event.key === ' ') {
         event.preventDefault()
         if (onClick && !disabled && !loading) {
-          onClick(event as any)
+          // Trigger click programmatically
+          event.currentTarget.click()
         }
       }
       onKeyDown?.(event)

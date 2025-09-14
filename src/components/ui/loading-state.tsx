@@ -191,17 +191,15 @@ export function useLoadingState(initialState = false) {
     setLoadingMessage(undefined)
   }, [])
   
-  const withLoading = React.useCallback(async <T>(
-    fn: () => Promise<T>,
-    message?: string
-  ): Promise<T> => {
-    startLoading(message)
-    try {
-      return await fn()
-    } finally {
-      stopLoading()
-    }
-  }, [startLoading, stopLoading])
+  const withLoading = React.useCallback(
+    (fn: () => Promise<unknown>, message?: string): Promise<unknown> => {
+      startLoading(message)
+      return fn().finally(() => {
+        stopLoading()
+      })
+    },
+    [startLoading, stopLoading]
+  )
   
   return {
     isLoading,
