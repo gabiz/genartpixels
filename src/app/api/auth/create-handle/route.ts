@@ -4,17 +4,20 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
+import { createServerClient } from '@/lib/supabase/serverClient'
+// import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
 import { validateHandle, VALIDATION_MESSAGES } from '@/lib/validation'
 import type { HandleCreationRequest, HandleCreationResponse } from '@/lib/auth/types'
+import { createServer } from 'http'
 
 export async function POST(request: NextRequest) {
   console.log("create handle called")
   try {
     // Create Supabase client that can read cookies for auth
-    const cookieStore = await cookies()
-    const supabase = createRouteHandlerClient({ cookies: () => cookieStore })
+    // const cookieStore = await cookies()
+    // const supabase = createRouteHandlerClient({ cookies: () => cookieStore })
+    const supabase = await createServerClient()
     
     // Create service role client for database operations (bypasses RLS)
     const { createClient } = await import('@supabase/supabase-js')
@@ -45,8 +48,6 @@ export async function POST(request: NextRequest) {
         }
       }
     }
-
-
 
     if (!user) {
       console.error('Authentication failed - no user found')

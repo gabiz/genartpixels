@@ -28,7 +28,7 @@ export function InteractiveFrameCanvas({
   onPixelClick,
   onViewportChange,
   className = '',
-  enablePixelInfo = true
+  enablePixelInfo = false
 }: InteractiveFrameCanvasProps) {
   const canvasRef = useRef<FrameCanvasRef>(null)
   const [tooltipState, setTooltipState] = useState<{

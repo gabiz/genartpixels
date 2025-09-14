@@ -119,6 +119,7 @@ export class RobustRealtimeManager {
   }
 
   private attemptSubscription(frameId: string, attempt: number): void {
+    return
     if (this.isDestroyed || !this.callbacks.has(frameId)) {
       return
     }

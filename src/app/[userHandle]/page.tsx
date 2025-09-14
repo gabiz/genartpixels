@@ -6,8 +6,7 @@
 
 import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
-import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
-import { cookies } from 'next/headers'
+import { createServerClient } from '@/lib/supabase/serverClient'
 import { UserProfile } from '@/components/user/user-profile'
 import type { User } from '@/lib/auth/types'
 
@@ -25,11 +24,12 @@ interface UserWithStats extends User {
 }
 
 export async function generateMetadata({ params }: UserProfilePageProps): Promise<Metadata> {
-  const { userHandle } = await params
+  const { userHandle } =  await params
 
   // Create Supabase client for server-side data fetching
-  const cookieStore = await cookies()
-  const supabase = createServerComponentClient({ cookies: () => cookieStore })
+  // const cookieStore = cookies()
+  // const supabase = createSeverClient({ cookies: () => cookieStore })
+  const supabase = await createServerClient()
 
   // Fetch user data for metadata
   const { data: user } = await supabase
@@ -57,8 +57,9 @@ export async function generateMetadata({ params }: UserProfilePageProps): Promis
 }
 
 async function getUserWithStats(userHandle: string): Promise<UserWithStats | null> {
-  const cookieStore = await cookies()
-  const supabase = createServerComponentClient({ cookies: () => cookieStore })
+  // const cookieStore = await cookies()
+  // const supabase = createServerComponentClient({ cookies: () => cookieStore })
+  const supabase = await createServerClient()
 
   // Fetch user data with statistics
   const { data: user, error } = await supabase
@@ -92,8 +93,9 @@ async function getUserWithStats(userHandle: string): Promise<UserWithStats | nul
 }
 
 async function getUserFrames(userHandle: string) {
-  const cookieStore = await cookies()
-  const supabase = createServerComponentClient({ cookies: () => cookieStore })
+  // const cookieStore = await cookies()
+  // const supabase = createServerComponentClient({ cookies: () => cookieStore })
+  const supabase = await createServerClient()
 
   // Fetch user's owned frames with stats
   const { data: ownedFrames } = await supabase

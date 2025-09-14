@@ -6,7 +6,7 @@
 import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { cookies } from 'next/headers'
-import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
+import { createServerClient } from '@/lib/supabase/serverClient'
 import type { Database } from '@/lib/supabase/database.types'
 import { FrameViewer } from '@/components/frames/frame-viewer'
 import type { FrameWithStats, FramePermission } from '@/lib/types'
@@ -19,11 +19,7 @@ interface PageProps {
 }
 
 async function getFrameData(userHandle: string, frameHandle: string) {
-  // const supabase = createServerComponentClient<Database>({
-  //   cookies: () => cookies(),
-  // })
-  const cookieStore = await cookies()
-  const supabase = createServerComponentClient({ cookies: () => cookieStore })
+  const supabase = await createServerClient()
 
   // Get the current user (if authenticated)
   const {

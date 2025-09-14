@@ -6,8 +6,6 @@ import type { Database } from '@/lib/supabase/database.types'
 import type { User as SupabaseUser } from '@supabase/supabase-js'
 import type { User, AuthContextType, AuthState, HandleCreationResponse } from './types'
 
-console.log("api", process.env.NEXT_PUBLIC_SUPABASE_URL)
-console.log("key", process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
 const supabase = createBrowserClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
@@ -50,6 +48,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (error.code === 'PGRST116') return null // not found
         throw error
       }
+      console.log("user", data)
       return data as User
     } catch (err) {
       console.error('Error fetching user profile:', err)

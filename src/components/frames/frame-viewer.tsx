@@ -89,46 +89,46 @@ export function FrameViewer({
   }, [])
 
   // Set up real-time subscription using robust manager
-  useEffect(() => {
-    const handleRealtimeEvent = (event: any) => {
-      console.log('Received realtime event:', event)
+  // useEffect(() => {
+  //   const handleRealtimeEvent = (event: any) => {
+  //     console.log('Received realtime event:', event)
       
-      switch (event.type) {
-        case 'pixel':
-          handlePixelUpdate(event.data)
-          break
-        case 'freeze':
-          setFrame(prev => ({ ...prev, is_frozen: event.data.isFrozen }))
-          break
-        case 'updateTitle':
-          setFrame(prev => ({ ...prev, title: event.data.title }))
-          break
-        case 'updatePermissions':
-          setFrame(prev => ({ ...prev, permissions: event.data.permissions }))
-          break
-        case 'delete':
-          router.push('/')
-          break
-      }
-    }
+  //     switch (event.type) {
+  //       case 'pixel':
+  //         handlePixelUpdate(event.data)
+  //         break
+  //       case 'freeze':
+  //         setFrame(prev => ({ ...prev, is_frozen: event.data.isFrozen }))
+  //         break
+  //       case 'updateTitle':
+  //         setFrame(prev => ({ ...prev, title: event.data.title }))
+  //         break
+  //       case 'updatePermissions':
+  //         setFrame(prev => ({ ...prev, permissions: event.data.permissions }))
+  //         break
+  //       case 'delete':
+  //         router.push('/')
+  //         break
+  //     }
+  //   }
 
-    console.log('Setting up robust realtime subscription for frame:', frame.id)
+  //   console.log('Setting up robust realtime subscription for frame:', frame.id)
     
-    try {
-      const robustManager = getRobustRealtimeManager()
-      robustManager.subscribeToFrame(frame.id, handleRealtimeEvent)
+  //   try {
+  //     const robustManager = getRobustRealtimeManager()
+  //     robustManager.subscribeToFrame(frame.id, handleRealtimeEvent)
       
-      return () => {
-        console.log('Cleaning up robust realtime subscription for frame:', frame.id)
-        robustManager.unsubscribeFromFrame(frame.id)
-      }
-    } catch (error) {
-      console.error('Failed to set up robust realtime subscription:', error)
-      // Fallback to original method
-      subscribe(handleRealtimeEvent)
-      return () => unsubscribe()
-    }
-  }, [router, frame.id, subscribe, unsubscribe])
+  //     return () => {
+  //       console.log('Cleaning up robust realtime subscription for frame:', frame.id)
+  //       robustManager.unsubscribeFromFrame(frame.id)
+  //     }
+  //   } catch (error) {
+  //     console.error('Failed to set up robust realtime subscription:', error)
+  //     // Fallback to original method
+  //     subscribe(handleRealtimeEvent)
+  //     return () => unsubscribe()
+  //   }
+  // }, [router, frame.id, subscribe, unsubscribe])
 
   const loadFrameData = async () => {
     try {
@@ -316,7 +316,7 @@ export function FrameViewer({
               </button>
 
               {/* Test Realtime button (development only) */}
-              {process.env.NODE_ENV === 'development' && (
+              {/* {process.env.NODE_ENV === 'development' && (
                 <button
                   onClick={async () => {
                     console.log('Running comprehensive realtime tests...')
@@ -408,7 +408,7 @@ export function FrameViewer({
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                   </svg>
                 </button>
-              )}
+              )} */}
 
               {/* Mobile pixel editor toggle */}
               {state.isMobile && canEdit && (
