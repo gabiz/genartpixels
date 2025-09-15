@@ -6,6 +6,7 @@
  */
 
 import React, { useState, useCallback, useEffect } from 'react'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { FrameWithStats, FramePermission, Pixel, FrameResponse } from '@/lib/types'
 import { useAuth } from '@/lib/auth/context'
@@ -288,7 +289,13 @@ export function FrameViewer({
                   {frame.title}
                 </h1>
                 <p className="text-sm text-gray-600 dark:text-gray-400">
-                  by @{frame.owner_handle}
+                  by 
+                  <Link
+                    href={`/${frame.owner_handle}`}
+                    className="px-1 text-blue-600"
+                  >
+                    @{frame.owner_handle}
+                 </Link>                 
                 </p>
               </div>
             </div>
@@ -454,7 +461,6 @@ export function FrameViewer({
       {/* Main content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {/* Desktop layout */}
-        {!state.isMobile ? (
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
             {/* Canvas and editor */}
             <div className="lg:col-span-3">
@@ -464,6 +470,7 @@ export function FrameViewer({
                   pixels={state.pixels}
                   onPixelPlaced={handlePixelPlaced}
                   onPixelUndone={handlePixelUndone}
+                  showColorPalette={state.showPixelEditor}
                 />
               ) : (
                 <div className="bg-white dark:bg-gray-800 rounded-lg p-4">
@@ -491,9 +498,6 @@ export function FrameViewer({
 
             {/* Sidebar */}
             <div className="lg:col-span-1 space-y-6">
-              {/* Frame stats */}
-              <DetailedFrameStats frame={frame} />
-
               {/* Frame description */}
               {frame.description && (
                 <div className="bg-white dark:bg-gray-800 rounded-lg p-4">
@@ -524,79 +528,12 @@ export function FrameViewer({
                   </div>
                 </div>
               )}
-            </div>
-          </div>
-        ) : (
-          /* Mobile layout */
-          <div className="space-y-4">
-            {/* Canvas */}
-            <div className="bg-white dark:bg-gray-800 rounded-lg p-4">
-              <InteractiveFrameCanvas
-                frame={frame}
-                pixels={state.pixels}
-                frameOwnerHandle={frameOwnerHandle}
-                frameHandle={frameHandle}
-                showGrid={true}
-                className="w-full h-64"
-                onPixelClick={canEdit && state.showPixelEditor ? handlePixelClick : undefined}
-              />
-            </div>
 
-            {/* Mobile pixel editor */}
-            {canEdit && state.showPixelEditor && (
-              <div className="bg-white dark:bg-gray-800 rounded-lg p-4">
-                <div className="space-y-4">
-                  {/* Mobile-optimized color palette */}
-                  <div>
-                    <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Select Color
-                    </h4>
-                    <ColorPalette
-                      selectedColor={0xFF000000} // This would come from pixel editor state
-                      onColorSelect={() => {}} // This would be handled by pixel editor
-                      isMobile={true}
-                    />
-                  </div>
-                  
-                  {/* Touch instructions */}
-                  <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-                    <p className="text-sm text-blue-700 dark:text-blue-300">
-                      Tap on the canvas above to place pixels. Use pinch to zoom and drag to pan.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Frame info */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {/* Frame stats */}
               <DetailedFrameStats frame={frame} />
-              
-              {frame.description && (
-                <div className="bg-white dark:bg-gray-800 rounded-lg p-4">
-                  <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-2">
-                    Description
-                  </h4>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
-                    {frame.description}
-                  </p>
-                </div>
-              )}
-            </div>
 
-            {/* Login prompt for mobile */}
-            {!user && (
-              <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 text-center">
-                <p className="text-blue-700 dark:text-blue-300">
-                  <a href={`/auth?redirect=${encodeURIComponent(window.location.pathname)}`} className="font-medium hover:underline">
-                    Sign in
-                  </a>{' '}
-                  to start placing pixels and collaborating!
-                </p>
-              </div>
-            )}
+            </div>
           </div>
-        )}
       </main>
 
       {/* Settings panel (owner only) */}

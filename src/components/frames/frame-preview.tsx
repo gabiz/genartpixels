@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { FrameWithStats } from '@/lib/types'
 import { LikeButton } from './like-button'
+import Image from 'next/image'
 
 interface FramePreviewProps {
   frame: FrameWithStats
@@ -38,16 +39,23 @@ export function FramePreview({ frame, className = '' }: FramePreviewProps) {
     >
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden transition-all duration-200 hover:shadow-md hover:border-gray-300 dark:hover:border-gray-600">
         {/* Frame Canvas Preview */}
-        <div className="aspect-square bg-gray-100 dark:bg-gray-900 relative overflow-hidden">
+        <div className="bg-gray-100 dark:bg-gray-900 relative overflow-hidden">
           <div 
-            className="w-full h-full bg-gray-200 dark:bg-gray-800 flex items-center justify-center transition-transform duration-200 group-hover:scale-105"
-            style={{
-              aspectRatio: `${frame.width} / ${frame.height}`,
-              maxWidth: '100%',
-              maxHeight: '100%'
-            }}
+            className="flex justify-between w-full py-6 bg-gray-200 dark:bg-gray-800 flex items-center justify-center transition-transform duration-200 group-hover:scale-105"
+            // style={{
+            //   aspectRatio: `${3 * frame.width} / ${frame.height}`,
+            //   maxWidth: '100%',
+            //   maxHeight: '20%'
+            // }}
           >
             {/* Placeholder for actual frame preview - will be replaced with canvas rendering */}
+            <Image
+              src="/artwork.png"
+              alt={"artwork"}
+              width={40}
+              height={40}
+              className="mx-4 grayscale"
+            />
             <div className="text-gray-400 dark:text-gray-600 text-sm font-mono">
               {frame.width}×{frame.height}
             </div>

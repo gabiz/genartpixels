@@ -20,6 +20,7 @@ export interface PixelEditorProps {
   onPixelPlaced?: (pixel: Pixel) => void
   onPixelUndone?: (x: number, y: number) => void
   className?: string
+  showColorPalette: boolean
 }
 
 export interface PixelEditorState {
@@ -36,7 +37,8 @@ export function PixelEditor({
   pixels, 
   onPixelPlaced, 
   onPixelUndone,
-  className = '' 
+  className = '',
+  showColorPalette
 }: PixelEditorProps) {
   const { user, refreshUser } = useAuth()
   const canvasRef = useRef<FrameCanvasRef>(null)
@@ -48,7 +50,7 @@ export function PixelEditor({
     isPlacing: false,
     lastPlacedPixel: null,
     userQuota: user?.pixels_available || 0,
-    lastRefill: user?.last_refill || new Date().toISOString()
+    lastRefill: user?.last_refill || new Date().toISOString(),
   })
 
   const [viewport, setViewport] = useState<CanvasViewport>({
@@ -308,12 +310,14 @@ export function PixelEditor({
         {/* Editing panel */}
         <div className="lg:col-span-1 space-y-4">
           {/* Color palette */}
-          <ColorPalette
-            selectedColor={state.selectedColor}
-            onColorSelect={handleColorSelect}
-            disabled={!canEditPixels}
-            isMobile={window.innerWidth < 768}
-          />
+          {!(window.innerWidth < 768 && !showColorPalette) && (
+            <ColorPalette
+              selectedColor={state.selectedColor}
+              onColorSelect={handleColorSelect}
+              disabled={!canEditPixels}
+              isMobile={window.innerWidth < 768}
+            />
+          )}
 
           {/* Quota display */}
           {user && (
@@ -324,10 +328,10 @@ export function PixelEditor({
           )}
 
           {/* Feedback display */}
-          <PixelFeedbackDisplay
+          {/* <PixelFeedbackDisplay
             feedback={feedback.feedback}
             onFeedbackExpire={feedback.removeFeedback}
-          />
+          /> */}
 
           {/* Frame info */}
           <div className="p-3 bg-gray-50 rounded-lg text-sm">

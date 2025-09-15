@@ -115,7 +115,6 @@ export function QuotaDisplay({
         <div className="font-medium">How it works:</div>
         <div>• You get {maxQuota} pixels per hour</div>
         <div>• Quota refills automatically</div>
-        <div>• Placing identical pixels is free</div>
       </div>
     </div>
   )

@@ -40,8 +40,8 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       .from('pixels')
       .select('x, y, color')
       .eq('frame_id', frameData.id)
-      .order('placed_at', { ascending: false })
-      .limit(1000) // Limit for performance
+      .order('placed_at', { ascending: true })
+      .limit(2000) // Limit for performance
 
     if (pixelsError) {
       console.error('Error fetching pixels:', pixelsError)

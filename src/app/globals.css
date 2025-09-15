@@ -162,3 +162,9 @@ select,
     display: none !important;
   }
 }
+
+/* Hide the Next.js dev overlay badge */
+#__next-build-watcher,
+nextjs-portal {
+  display: none !important;
+}

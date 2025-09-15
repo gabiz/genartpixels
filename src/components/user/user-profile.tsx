@@ -5,12 +5,13 @@
 
 'use client'
 
-import React from 'react'
+import React, { useState, useCallback, useEffect } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { formatDistanceToNow } from 'date-fns'
 import { useAuth } from '@/lib/auth/context'
 import { FramePreview } from '@/components/frames/frame-preview'
+import { FrameCreationDialog } from '@/components/frames/frame-creation-dialog'
 import type { User } from '@/lib/auth/types'
 import type { FrameWithStats } from '@/lib/types'
 
@@ -55,6 +56,18 @@ export function UserProfile({ user, ownedFrames, contributedFrames }: UserProfil
   const joinedDate = new Date(user.created_at)
   const joinedAgo = formatDistanceToNow(joinedDate, { addSuffix: true })
 
+  const [ isCreationDialogOpen, setCreationDialogOpen ] = useState<boolean>(false)
+  
+  const handleFrameCreated = useCallback((frame: any) => {
+    console.log('frame created:', frame)
+  }, [])
+
+  const handleCreationOnClose = useCallback(() => {
+    console.log('on close')
+    setCreationDialogOpen(false)
+  }, [])
+
+
   return (
     <div className="space-y-8">
       {/* Profile Header */}
@@ -88,7 +101,17 @@ export function UserProfile({ user, ownedFrames, contributedFrames }: UserProfil
                   Joined {joinedAgo}
                 </p>
               </div>
-              
+
+              <div>
+              {isOwnProfile && (
+                <button
+                  onClick={() => setCreationDialogOpen(true)}
+                  className="mx-2 inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                >
+                  Create Frame
+                </button>
+              )}
+
               {isOwnProfile && (
                 <Link
                   href="/settings"
@@ -97,6 +120,7 @@ export function UserProfile({ user, ownedFrames, contributedFrames }: UserProfil
                   Edit Profile
                 </Link>
               )}
+              </div>
             </div>
 
             {/* Statistics */}
@@ -158,16 +182,22 @@ export function UserProfile({ user, ownedFrames, contributedFrames }: UserProfil
               {isOwnProfile ? "You haven't created any frames yet." : `${user.handle} hasn't created any frames yet.`}
             </p>
             {isOwnProfile && (
-              <Link
-                href="/frames/create"
-                className="inline-flex items-center mt-4 px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-              >
-                Create Your First Frame
-              </Link>
+                <button
+                  onClick={() => setCreationDialogOpen(true)}
+                  className="inline-flex items-center mt-4 px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                >
+                  Create Your First Frame
+                </button>
             )}
           </div>
         )}
       </div>
+
+      <FrameCreationDialog
+        isOpen={isCreationDialogOpen}
+        onClose={handleCreationOnClose}
+        onFrameCreated={handleFrameCreated}
+      />
 
       {/* Contributed Frames Section */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
@@ -185,7 +215,7 @@ export function UserProfile({ user, ownedFrames, contributedFrames }: UserProfil
           )}
         </div>
 
-        {contributedFrames.length < 0 ? (
+        {contributedFrames.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {contributedFrames.map((contribution) => (
               <div key={contribution.frame_id} className="relative">

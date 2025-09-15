@@ -6,8 +6,7 @@
 
 import { Metadata } from 'next'
 import { redirect } from 'next/navigation'
-import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
-import { cookies } from 'next/headers'
+import { createServerClient } from '@/lib/supabase/serverClient'
 import { UserSettings } from '@/components/user/user-settings'
 
 export const metadata: Metadata = {
@@ -16,7 +15,7 @@ export const metadata: Metadata = {
 }
 
 async function getCurrentUser() {
-  const supabase = createServerComponentClient({ cookies })
+  const supabase = await createServerClient()
 
   const { data: { user: supabaseUser } } = await supabase.auth.getUser()
   

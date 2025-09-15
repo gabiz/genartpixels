@@ -1,11 +1,14 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
+import Image from 'next/image'
+import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { FrameWithStats, FrameListResponse, APIResponse, APIError } from '@/lib/types'
 import { FrameSearch } from './frame-search'
 import { FrameGrid } from './frame-grid'
 import { FramePagination } from './frame-pagination'
+import { useAuth } from '@/lib/auth/context'
 
 interface FrameDashboardProps {
   initialData?: FrameListResponse
@@ -29,6 +32,8 @@ export function FrameDashboard({ initialData, className = '' }: FrameDashboardPr
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>(
     (searchParams.get('sortOrder') as 'asc' | 'desc') || 'desc'
   )
+
+  const { user } = useAuth()
 
   // Fetch frames from API
   const fetchFrames = useCallback(async (
@@ -61,8 +66,9 @@ export function FrameDashboard({ initialData, className = '' }: FrameDashboardPr
       }
 
       const successData = data as APIResponse<FrameListResponse>
+      console.log("successData", successData)
       setFrames(successData.data.frames)
-      setTotalItems(successData.data.total)
+      setTotalItems(successData.data.frames.length)
       setCurrentPage(successData.data.page)
     } catch (err) {
       console.error('Error fetching frames:', err)
@@ -119,32 +125,82 @@ export function FrameDashboard({ initialData, className = '' }: FrameDashboardPr
   return (
     <div className={`space-y-6 ${className}`}>
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-            Discover Frames
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400">
-            Explore collaborative pixel art created by the community
-          </p>
+      <div className="flex flex-row items-center justify-between flex-col gap-4">
+        <div className="flex items-center gap-4">
+          <div className="w-[70px] h-[70px] flex-shrink-0">
+            <Image 
+              src="/artwork.png" 
+              alt="GenArtPixels Logo" 
+              width={70} 
+              height={70} 
+            />
+          </div>
+
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+              Gen Art Pixels
+            </h1>
+            <p className="text-gray-600 dark:text-gray-400">
+              Explore collaborative pixel art created by the community
+            </p>
+          </div>
         </div>
-        
-        {/* Refresh button */}
-        <button
-          onClick={refreshFrames}
-          disabled={loading}
-          className="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          <svg 
-            className={`-ml-1 mr-2 h-4 w-4 ${loading ? 'animate-spin' : ''}`} 
-            fill="none" 
-            stroke="currentColor" 
-            viewBox="0 0 24 24"
+
+        <div className="flex items-center">
+          {/* Refresh button */}
+          <button
+            onClick={refreshFrames}
+            disabled={loading}
+            className="hidden sm:inline-flex items-center mx-4 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-          </svg>
-          Refresh
-        </button>
+            <svg 
+              className={`-ml-1 mr-2 h-4 w-4 ${loading ? 'animate-spin' : ''}`} 
+              fill="none" 
+              stroke="currentColor" 
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+            Refresh
+          </button>
+
+          {/* Avatar */}
+          {user && (
+          <Link
+            href={`/${user.handle}`}
+            className="inline-flex"
+          >
+            {user.avatar_url ? (
+              <div className="w-15 h-15 bg-gray-300 rounded-full flex items-center justify-center overflow-hidden">
+                <Image
+                  src={user.avatar_url}
+                  alt={`${user.handle}'s avatar`}
+                  width={50}
+                  height={50}
+                  className="w-full h-full object-cover"
+                />
+              </div>            
+              ) : (
+              <div className="w-15 h-15 bg-gray-300 rounded-full flex items-center justify-center">
+                <span className="text-2xl font-bold text-gray-600">
+                  {user.handle.charAt(0).toUpperCase()}
+                </span>
+              </div>
+            )}
+          </Link>
+          )}
+          
+          {/* login button */}
+          {!user && (
+            <Link
+              href="/auth"
+              className="inline-flex items-center whitespace-nowrap px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Sign in
+            </Link>
+          )}
+        </div>
+
       </div>
 
       {/* Search and filters */}

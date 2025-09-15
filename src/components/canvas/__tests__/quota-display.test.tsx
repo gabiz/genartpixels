@@ -220,7 +220,6 @@ describe('QuotaDisplay', () => {
     expect(screen.getByText('How it works:')).toBeInTheDocument()
     expect(screen.getByText('• You get 100 pixels per hour')).toBeInTheDocument()
     expect(screen.getByText('• Quota refills automatically')).toBeInTheDocument()
-    expect(screen.getByText('• Placing identical pixels is free')).toBeInTheDocument()
   })
 
   test('handles Date object as lastRefill prop', () => {

@@ -130,12 +130,40 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     }
 
     // Get recent pixels since last snapshot
-    const { data: recentPixels, error: pixelsError } = await supabase
-      .from('pixels')
-      .select('*')
-      .eq('frame_id', frame.id)
-      .gte('placed_at', snapshotCreatedAt)
-      .order('placed_at', { ascending: true })
+    // const { data: recentPixels, error: pixelsError } = await supabase
+    //   .from('pixels')
+    //   .select('*')
+    //   .eq('frame_id', frame.id)
+    //   .order('placed_at', { ascending: true })
+    //   .range(0, 1999)
+
+    const pageSize = 1000
+    let from = 0
+    let to = pageSize - 1
+    let all: any[] = []
+    let done = false
+    let pixelsError = null
+    let recentPixels: any[] = []
+
+    while (!done) {
+      const { data: recentPixels, error: pixelsError } = await supabase
+        .from('pixels')
+        .select('*')
+        .eq('frame_id', frame.id)
+        .order('placed_at', { ascending: true })
+        .range(from, to);
+
+      if (pixelsError) break;
+
+      all = all.concat(recentPixels);
+
+      if (recentPixels.length < pageSize) {
+        done = true; // last page
+      } else {
+        from += pageSize;
+        to += pageSize;
+      }
+    }
 
     if (pixelsError) {
       console.error('Error fetching recent pixels:', pixelsError)
@@ -150,7 +178,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       data: {
         frame,
         snapshotData: snapshotBuffer,
-        recentPixels: recentPixels || [],
+        recentPixels: all || [],
         userPermission
       }
     }

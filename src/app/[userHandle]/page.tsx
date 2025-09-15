@@ -27,9 +27,6 @@ interface UserWithStats extends User {
 export async function generateMetadata({ params }: UserProfilePageProps): Promise<Metadata> {
   const { userHandle } =  await params
 
-  // Create Supabase client for server-side data fetching
-  // const cookieStore = cookies()
-  // const supabase = createSeverClient({ cookies: () => cookieStore })
   const supabase = await createServerClient()
 
   // Fetch user data for metadata
@@ -58,8 +55,6 @@ export async function generateMetadata({ params }: UserProfilePageProps): Promis
 }
 
 async function getUserWithStats(userHandle: string): Promise<UserWithStats | null> {
-  // const cookieStore = await cookies()
-  // const supabase = createServerComponentClient({ cookies: () => cookieStore })
   const supabase = await createServerClient()
 
   // Fetch user data with statistics
@@ -108,55 +103,73 @@ async function getUserFrames(userHandle: string) {
 
   // Fetch frames user has contributed to (recent contributions)
   const { data: contributedFrames } = await supabase
-    .from('pixels')
+    .from('frames')
     .select(`
-      frame_id,
-      placed_at,
-      frames!inner(
-        id,
-        handle,
-        title,
-        description,
-        owner_handle,
-        width,
-        height,
-        created_at,
-        updated_at,
-        is_frozen,
-        keywords,
-        permissions,
-        frame_stats!inner(
-          frame_id,
-          contributors_count,
-          total_pixels,
-          likes_count,
-          last_activity,
-          updated_at
-        )
+      id,
+      handle,
+      title,
+      description,
+      owner_handle,
+      width,
+      height,
+      created_at,
+      updated_at,
+      is_frozen,
+      keywords,
+      permissions,
+      frame_stats!inner(
+        frame_id,
+        contributors_count,
+        total_pixels,
+        likes_count,
+        last_activity,
+        updated_at
       )
     `)
-    .eq('contributor_handle', userHandle)
-    .order('placed_at', { ascending: false })
+    .in(
+      'id',
+      (
+        await supabase
+          .from('pixels')
+          .select('frame_id')
+          .eq('contributor_handle', userHandle)
+      ).data?.map((p) => p.frame_id) ?? []
+    )
+    .order('updated_at', { ascending: false })
     .limit(12)
 
-  // Process contributed frames to remove duplicates and get unique frames
-  const uniqueContributedFrames = contributedFrames?.reduce((acc, pixel) => {
-    const frameId = pixel.frame_id
-    if (!acc.find(item => item.frame_id === frameId)) {
-      const frameData = Array.isArray(pixel.frames) ? pixel.frames[0] : pixel.frames
-      const statsData = Array.isArray(frameData.frame_stats) ? frameData.frame_stats[0] : frameData.frame_stats
-      
-      acc.push({
-        frame_id: frameId,
-        last_contribution: pixel.placed_at,
+  console.log("frames: ", contributedFrames)
+
+  const uniqueContributedFrames = contributedFrames?.map((frame) => {
+      return {
+        frame_id: frame.id,
+        last_contribution: frame.updated_at,
         frame: {
-          ...frameData,
-          stats: statsData,
+          ...frame,
+          stats: frame.frame_stats,
         },
-      })
-    }
-    return acc
+       }
   }, [] as Array<{ frame_id: string; last_contribution: string; frame: FrameWithStats }>)
+
+  // Process contributed frames to remove duplicates and get unique frames
+  // const uniqueContributedFrames = contributedFrames?.reduce((acc, pixel) => {
+  //   const frameId = pixel.frame_id
+  //   if (!acc.find(item => item.frame_id === frameId)) {
+  //     const frameData = Array.isArray(pixel.frames) ? pixel.frames[0] : pixel.frames
+  //     const statsData = Array.isArray(frameData.frame_stats) ? frameData.frame_stats[0] : frameData.frame_stats
+      
+  //     acc.push({
+  //       frame_id: frameId,
+  //       last_contribution: pixel.placed_at,
+  //       frame: {
+  //         ...frameData,
+  //         stats: statsData,
+  //       },
+  //     })
+  //   }
+  //   return acc
+  // }, [] as Array<{ frame_id: string; last_contribution: string; frame: FrameWithStats }>)
+
 
   return {
     ownedFrames: ownedFrames ? ownedFrames.map(({ contributors_count, total_pixels, likes_count, last_activity, ...rest }) => ({
