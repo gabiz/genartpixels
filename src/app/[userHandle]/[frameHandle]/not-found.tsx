@@ -56,7 +56,7 @@ export default function FrameNotFound() {
           </div>
         </div>
         
-        <div className="mt-12 p-6 bg-white dark:bg-gray-800 rounded-lg shadow-sm max-w-md mx-auto">
+        {/* <div className="mt-12 p-6 bg-white dark:bg-gray-800 rounded-lg shadow-sm max-w-md mx-auto">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">
             Create Your Own Frame
           </h3>
@@ -72,7 +72,7 @@ export default function FrameNotFound() {
             </svg>
             Create Frame
           </Link>
-        </div>
+        </div> */}
       </div>
     </div>
   )

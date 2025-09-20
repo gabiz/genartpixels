@@ -445,6 +445,7 @@ describe('PixelEditor', () => {
       <PixelEditor 
         frame={mockFrame}
         pixels={mockPixels}
+        showColorPalette={true}
       />
     )
 
@@ -462,6 +463,7 @@ describe('PixelEditor', () => {
       <PixelEditor 
         frame={mockFrame}
         pixels={mockPixels}
+        showColorPalette={true}
       />
     )
 
@@ -476,6 +478,7 @@ describe('PixelEditor', () => {
       <PixelEditor 
         frame={mockFrame}
         pixels={mockPixels}
+        showColorPalette={true}
       />
     )
 
@@ -490,6 +493,7 @@ describe('PixelEditor', () => {
       <PixelEditor 
         frame={mockFrame}
         pixels={mockPixels}
+        showColorPalette={true}
       />
     )
 

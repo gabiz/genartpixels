@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useCallback, useRef } from 'react'
+import React, { useEffect, useState, useCallback, useRef } from 'react'
 import { Frame, Pixel } from '@/lib/types'
 import { FrameCanvas, FrameCanvasRef, CanvasViewport, CanvasInteraction } from './frame-canvas'
 import { PixelInfoTooltip } from './pixel-info-tooltip'
@@ -44,6 +44,27 @@ export function InteractiveFrameCanvas({
     pixelX: 0,
     pixelY: 0
   })
+
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => { 
+    setMounted(true)
+  }, [])
+
+  useEffect(() => {
+    if (!mounted) return
+    const fitZoom = canvasRef.current?.fitToFrame() || 1
+  }, [mounted])
+
+  const [stateViewport, setViewport] = useState<CanvasViewport>({
+    x: 0,
+    y: 0,
+    zoom: 1
+  })
+
+  const handleViewportChange = useCallback((newViewport: CanvasViewport) => {
+    setViewport(newViewport)
+  }, [])
 
   const handlePixelClick = useCallback((pixelX: number, pixelY: number) => {
     if (onPixelClick) {
@@ -126,23 +147,23 @@ export function InteractiveFrameCanvas({
   const interaction: CanvasInteraction = {
     onPixelClick: handlePixelClick,
     onPixelHover: handlePixelHover,
-    onViewportChange
+    onViewportChange: handleViewportChange
   }
 
   return (
     <div 
       className={`relative ${className}`}
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
-      onTouchStart={handleTouchStart}
-      onTouchEnd={handleTouchEnd}
+      // onMouseMove={handleMouseMove}
+      // onMouseLeave={handleMouseLeave}
+      // onTouchStart={handleTouchStart}
+      // onTouchEnd={handleTouchEnd}
     >
       <FrameCanvas
         ref={canvasRef}
         frame={frame}
         pixels={pixels}
         showGrid={showGrid}
-        viewport={viewport}
+        viewport={stateViewport}
         interaction={interaction}
         className="w-full h-full"
       />

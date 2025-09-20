@@ -38,16 +38,23 @@ export default function RealtimeTestPage() {
   }, [])
 
   // Handle pixel updates
-  usePixelUpdates(frameId, useCallback((pixel: Pixel) => {
-    setPixels(prev => {
-      const filtered = prev.filter(p => !(p.x === pixel.x && p.y === pixel.y))
-      return [...filtered, pixel]
-    })
-    logEvent(`Pixel placed at (${pixel.x}, ${pixel.y}) by ${pixel.contributor_handle}`)
-  }, [logEvent]))
+  // usePixelUpdates(frameId, useCallback((pixel: Pixel) => {
+  //   setPixels(prev => {
+  //     const filtered = prev.filter(p => !(p.x === pixel.x && p.y === pixel.y))
+  //     return [...filtered, pixel]
+  //   })
+  //   logEvent(`Pixel placed at (${pixel.x}, ${pixel.y}) by ${pixel.contributor_handle}`)
+  // }, [logEvent]))
 
   // Handle frame state updates
   useFrameStateUpdates(frameId, {
+    onPixelUpdate: useCallback((pixel: Pixel) => {
+      setPixels(prev => {
+        const filtered = prev.filter(p => !(p.x === pixel.x && p.y === pixel.y))
+        return [...filtered, pixel]
+      })
+      logEvent(`Pixel placed at (${pixel.x}, ${pixel.y}) by ${pixel.contributor_handle}`)
+    }, [logEvent]),
     onFreeze: useCallback((frozen: boolean) => {
       setIsFrozen(frozen)
       logEvent(`Frame ${frozen ? 'frozen' : 'unfrozen'}`)
@@ -66,15 +73,15 @@ export default function RealtimeTestPage() {
   })
 
   // Subscribe to frame on mount
-  useEffect(() => {
-    if (frameId) {
-      subscribe()
-      logEvent(`Subscribed to frame: ${frameId}`)
-    }
-    return () => {
-      unsubscribe()
-    }
-  }, [frameId, subscribe, unsubscribe, logEvent])
+  // useEffect(() => {
+  //   if (frameId) {
+  //     subscribe()
+  //     logEvent(`Subscribed to frame: ${frameId}`)
+  //   }
+  //   return () => {
+  //     unsubscribe()
+  //   }
+  // }, [frameId])
 
   // Handle pixel placement
   const handlePixelClick = async (x: number, y: number) => {
@@ -242,7 +249,10 @@ export default function RealtimeTestPage() {
             <input
               type="text"
               value={frameId}
-              onChange={(e) => setFrameId(e.target.value)}
+              onChange={(e) => {
+                console.log("frameId: ", frameId, " => target: ", e.target.value)
+                if (e.target.value != frameId) setFrameId(e.target.value)
+              }}
               className="px-3 py-1 border rounded"
             />
           </div>

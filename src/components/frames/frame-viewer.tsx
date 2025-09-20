@@ -479,7 +479,7 @@ export function FrameViewer({
                     pixels={state.pixels}
                     frameOwnerHandle={frameOwnerHandle}
                     frameHandle={frameHandle}
-                    showGrid={true}
+                    showGrid={false}
                     className="w-full h-96"
                   />
                   {!user && (

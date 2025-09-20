@@ -54,8 +54,17 @@ export const FrameCanvas = forwardRef<FrameCanvasRef, FrameCanvasProps>(({
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   
-  const [currentViewport, setCurrentViewport] = useState<CanvasViewport>(viewport)
-  
+  // const [currentViewport, setCurrentViewport] = useState<CanvasViewport>(viewport)
+  const [currentViewport, setCurrentViewport] = useState<CanvasViewport>(() => {
+    if (typeof window === 'undefined') return DEFAULT_VIEWPORT
+    const rect = containerRef.current?.getBoundingClientRect()
+    if (!rect) return DEFAULT_VIEWPORT
+    const scaleX = rect.width / frame.width
+    const scaleY = rect.height / frame.height
+    const fitZoom = Math.min(scaleX, scaleY)
+    return { x: 0, y: 0, zoom: fitZoom }
+  })
+
   const [isDragging, setIsDragging] = useState(false)
   const [isOneTouch, setIsOneTouch] = useState(false)
   const [firstMousePos, setFirstMousePos] = useState({ x: 0, y: 0 })
@@ -198,42 +207,48 @@ export const FrameCanvas = forwardRef<FrameCanvasRef, FrameCanvasProps>(({
   }
 
   // Convert screen coordinates to pixel coordinates
-  const screenToPixel = useCallback((clientX: number, clientY: number): { x: number; y: number } | null => {
-    const canvas = canvasRef.current
-    if (!canvas) return null
+  const screenToPixel = useCallback(
+    (clientX: number, clientY: number): { x: number; y: number } | null => {
+      const canvas = canvasRef.current
+      if (!canvas) return null
 
-    const rect = canvas.getBoundingClientRect()
-    const { x: panX, y: panY, zoom } = currentViewport
+      const rect = canvas.getBoundingClientRect()
+      const { x: panX, y: panY, zoom } = currentViewport
 
-    // Convert to canvas coordinates
-    const canvasX = clientX - rect.left
-    const canvasY = clientY - rect.top
+      // Screen → canvas coords
+      const canvasX = clientX - rect.left
+      const canvasY = clientY - rect.top
 
-    // Convert to frame coordinates
-    const frameX = (canvasX - rect.width / 2) / zoom - panX + frame.width / 2
-    const frameY = (canvasY - rect.height / 2) / zoom - panY + frame.height / 2
+      // Undo initial translate to center
+      const normX = (canvasX - rect.width / 2) / zoom
+      const normY = (canvasY - rect.height / 2) / zoom
 
-    // Convert to pixel coordinates (floor to get pixel index)
-    const pixelX = Math.floor(frameX)
-    const pixelY = Math.floor(frameY)
+      // Undo final translate (-frame.width/2 + panX, -frame.height/2 + panY)
+      const frameX = normX + frame.width / 2 - panX
+      const frameY = normY + frame.height / 2 - panY
 
-    // Check bounds
-    if (pixelX < 0 || pixelX >= frame.width || pixelY < 0 || pixelY >= frame.height) {
-      return null
-    }
+      // Bounds check
+      if (frameX < 0 || frameX >= frame.width || frameY < 0 || frameY >= frame.height) {
+        return null
+      }
 
-    return { x: pixelX, y: pixelY }
-  }, [frame, currentViewport])
+      return {
+        x: Math.floor(frameX),
+        y: Math.floor(frameY),
+      }
+    },
+    [frame, currentViewport]
+  )
 
   const handleWheelSafe = useCallback((e: WheelEvent) => {
     // Skip pinch-to-zoom gestures that are passive
-    if (!e.ctrlKey) {
-      e.preventDefault()
-    }
-  
-    // Your zoom logic
+    // if (!e.ctrlKey) {
+    //   e.preventDefault()
+    // }
+    e.preventDefault()  
+
+    // zoom logic
     const zoomDelta = e.deltaY > 0 ? 1 / ZOOM_FACTOR : ZOOM_FACTOR
-    // const newZoom = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, currentViewport.zoom * zoomDelta))
     const newZoom = Math.max(minZoom, Math.min(MAX_ZOOM, currentViewport.zoom * zoomDelta))
     
     const rect = canvasRef.current?.getBoundingClientRect()
@@ -278,6 +293,7 @@ export const FrameCanvas = forwardRef<FrameCanvasRef, FrameCanvasProps>(({
       zoom: fitZoom // Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, zoom))
     }
     
+    setMinZoom(fitZoom)
     setCurrentViewport(newViewport)
     interaction?.onViewportChange?.(newViewport)
     return fitZoom
@@ -286,11 +302,9 @@ export const FrameCanvas = forwardRef<FrameCanvasRef, FrameCanvasProps>(({
   const [minZoom, setMinZoom] = useState(1)
 
   useEffect(() => {
-    console.log("use effect")
+    if (!frame) return
     const fitZoom = fitToFrame()
-    console.log("min zoom", fitZoom)
-    setMinZoom(fitZoom || 1)
-  }, [frame, canvasRef.current])
+  }, [frame.width, frame.height])
 
   // Expose methods via ref
   useImperativeHandle(ref, () => ({
@@ -319,11 +333,6 @@ export const FrameCanvas = forwardRef<FrameCanvasRef, FrameCanvasProps>(({
     getPixelAtCoordinate: screenToPixel,
     getViewport: () => currentViewport
   }), [currentViewport, fitToFrame, screenToPixel, interaction])
-
-  // Update viewport when prop changes
-  useEffect(() => {
-    setCurrentViewport(viewport)
-  }, [viewport])
 
   // Render when viewport or pixels change
   useEffect(() => {
@@ -361,10 +370,10 @@ export const FrameCanvas = forwardRef<FrameCanvasRef, FrameCanvasProps>(({
   const handleMouseDown = useCallback((e: MouseEvent) => {
     if (e.button === 0) { // Left click
       const pixelCoord = screenToPixel(e.clientX, e.clientY)
-      if (pixelCoord && interaction?.onPixelClick) {
-        interaction.onPixelClick(pixelCoord.x, pixelCoord.y)
+      if (pixelCoord) { 
+        interaction?.onPixelClick?.(pixelCoord.x, pixelCoord.y)
       }
-    } else if (e.button === 1 || e.button === 2) { // Middle or right click for panning
+   } else if (e.button === 1 || e.button === 2) { // Middle or right click for panning
       setIsDragging(true)
       setLastMousePos({ x: e.clientX, y: e.clientY })
       e.preventDefault()
@@ -404,12 +413,15 @@ export const FrameCanvas = forwardRef<FrameCanvasRef, FrameCanvasProps>(({
   
   // Attach global listeners once
   useEffect(() => {
-    document.addEventListener('mousedown', handleMouseDown, { passive: false })
-    document.addEventListener('mousemove', handleMouseMove, { passive: false })
+    const canvas = canvasRef.current
+    if (!canvas) return
+
+    canvas.addEventListener('mousedown', handleMouseDown, { passive: false })
+    canvas.addEventListener('mousemove', handleMouseMove, { passive: false })
     document.addEventListener('mouseup', handleMouseUp, { passive: false })
     return () => {
-      document.removeEventListener('mousedown', handleMouseDown)
-      document.removeEventListener('mousemove', handleMouseMove)
+      canvas.removeEventListener('mousedown', handleMouseDown)
+      canvas.removeEventListener('mousemove', handleMouseMove)
       document.removeEventListener('mouseup', handleMouseUp)
     }
   }, [handleMouseMove])
@@ -490,25 +502,28 @@ export const FrameCanvas = forwardRef<FrameCanvasRef, FrameCanvasProps>(({
   
     const handleTouchEnd = () => {
       if (isOneTouch) {
-        if ((lastMousePos.x - firstMousePos.x < 10) &&
-          (lastMousePos.y - firstMousePos.y < 10)) {
+        const movedX = Math.abs(lastMousePos.x - firstMousePos.x)
+        const movedY = Math.abs(lastMousePos.y - firstMousePos.y)
+
+        // Treat as a tap if movement is tiny
+        if (movedX < 10 && movedY < 10) {
           const pixelCoord = screenToPixel(lastMousePos.x, lastMousePos.y)
-          if (pixelCoord && interaction?.onPixelClick) {
-            interaction.onPixelClick(pixelCoord.x, pixelCoord.y)
+          if (pixelCoord) {  // ✅ only fire if inside frame
+            interaction?.onPixelClick?.(pixelCoord.x, pixelCoord.y)
           }
         }
       }
       setIsDragging(false)
     }
-  
+
     canvas.addEventListener("touchstart", handleTouchStart, { passive: false })
     canvas.addEventListener("touchmove", handleTouchMove, { passive: false })
-    canvas.addEventListener("touchend", handleTouchEnd, { passive: false })
+    document.addEventListener("touchend", handleTouchEnd, { passive: false })
   
     return () => {
       canvas.removeEventListener("touchstart", handleTouchStart)
       canvas.removeEventListener("touchmove", handleTouchMove)
-      canvas.removeEventListener("touchend", handleTouchEnd)
+      document.removeEventListener("touchend", handleTouchEnd)
     }
   }, [currentViewport, isDragging, firstMousePos, lastMousePos, interaction])
   
@@ -519,11 +534,7 @@ export const FrameCanvas = forwardRef<FrameCanvasRef, FrameCanvasProps>(({
     >
       <canvas
         ref={canvasRef}
-        className="block cursor-crosshair"
-        // onMouseDown={handleMouseDown}
-        // onMouseMove={handleMouseMove}
-        // onMouseUp={handleMouseUp}
-        // onWheel={handleWheelSafe}
+        className="block cursor-crosshair touch-none width:100% height:100%"
         onContextMenu={(e) => e.preventDefault()}
       />
     </div>

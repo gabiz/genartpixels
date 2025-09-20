@@ -152,6 +152,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // Sign out
   const signOut = useCallback(async () => {
     await supabase.auth.signOut()
+    setState({
+      user: null,
+      supabaseUser: null,
+      loading: false,
+      initialized: true,
+    })
   }, [])
 
   // Create handle

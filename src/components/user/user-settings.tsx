@@ -7,6 +7,7 @@
 
 import React, { useState, useCallback } from 'react'
 import Image from 'next/image'
+import { useRouter } from 'next/navigation'
 import { useAuth } from '@/lib/auth/context'
 import { supabase } from '@/lib/supabase/client'
 import type { User } from '@/lib/auth/types'
@@ -15,14 +16,13 @@ interface UserSettingsProps {
   user: User
 }
 
-
-
 export function UserSettings({ user: initialUser }: UserSettingsProps) {
   const { refreshUser, signOut } = useAuth()
   const [user, setUser] = useState(initialUser)
   const [isUpdating, setIsUpdating] = useState(false)
   const [updateMessage, setUpdateMessage] = useState('')
   const [updateError, setUpdateError] = useState('')
+  const router = useRouter()
 
   const handleAvatarUpdate = useCallback(async (avatarUrl: string) => {
     setIsUpdating(true)
@@ -53,6 +53,7 @@ export function UserSettings({ user: initialUser }: UserSettingsProps) {
   const handleSignOut = useCallback(async () => {
     try {
       await signOut()
+      router.push('/')
     } catch (error) {
       console.error('Error signing out:', error)
     }

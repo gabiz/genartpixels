@@ -137,7 +137,7 @@ export function ColorPalette({
       <div 
         ref={gridRef as React.RefObject<HTMLDivElement>}
         className={`
-          grid gap-2 p-3 bg-muted/30 rounded-lg border
+          grid gap-5 py-3 pl-1 pr-10 bg-muted/30 rounded-lg border
           ${isMobile ? 'grid-cols-6 gap-3' : 'grid-cols-8'}
         `}
         role="radiogroup"

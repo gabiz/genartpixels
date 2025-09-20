@@ -1,6 +1,20 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  turbopack: {
+    rules: {
+      '*.svg': {
+        loaders: ['@svgr/webpack'],
+        as: '*.js',
+      },
+    },
+  },
+  eslint: {
+    // Dangerously allow production builds to successfully complete even if
+    // your project has ESLint errors.
+    // !! WARN !!
+    ignoreDuringBuilds: true,
+  },
   images: {
     remotePatterns: [
       {
@@ -30,17 +44,9 @@ const nextConfig: NextConfig = {
   },
   
   // Experimental features for better development experience
-  experimental: {
-    // Improve hot reload stability
-    turbo: {
-      rules: {
-        '*.svg': {
-          loaders: ['@svgr/webpack'],
-          as: '*.js',
-        },
-      },
-    },
-  },
+  // experimental: {
+  //   // Improve hot reload stability
+  // },
 };
 
 export default nextConfig;

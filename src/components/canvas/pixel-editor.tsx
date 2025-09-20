@@ -53,6 +53,17 @@ export function PixelEditor({
     lastRefill: user?.last_refill || new Date().toISOString(),
   })
 
+  const [mounted, setMounted] = useState(false)
+  
+  useEffect(() => { 
+    setMounted(true)
+  }, [])
+
+  useEffect(() => {
+    if (!mounted) return
+    const fitZoom = canvasRef.current?.fitToFrame() || 1
+  }, [mounted])
+  
   const [viewport, setViewport] = useState<CanvasViewport>({
     x: 0,
     y: 0,

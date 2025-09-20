@@ -151,23 +151,23 @@ export function useFrameBroadcast() {
 /**
  * Hook for handling pixel updates in real-time
  */
-export function usePixelUpdates(frameId: string | null, onPixelUpdate?: (pixel: Pixel) => void) {
-  const { subscribe, unsubscribe, isSubscribed } = useFrameRealtime(frameId)
+// export function usePixelUpdates(frameId: string | null, onPixelUpdate?: (pixel: Pixel) => void) {
+//   const { subscribe, unsubscribe, isSubscribed } = useFrameRealtime(frameId)
 
-  useEffect(() => {
-    if (!frameId) return
+//   useEffect(() => {
+//     if (!frameId) return
 
-    subscribe((event) => {
-      if (event.type === 'pixel') {
-        onPixelUpdate?.(event.data)
-      }
-    })
+//     subscribe((event) => {
+//       if (event.type === 'pixel') {
+//         onPixelUpdate?.(event.data)
+//       }
+//     })
 
-    return unsubscribe
-  }, [frameId, subscribe, unsubscribe, onPixelUpdate])
+//     return unsubscribe
+//   }, [frameId, subscribe, unsubscribe, onPixelUpdate])
 
-  return { isSubscribed }
-}
+//   return { isSubscribed }
+// }
 
 /**
  * Hook for handling frame state changes in real-time
@@ -175,6 +175,7 @@ export function usePixelUpdates(frameId: string | null, onPixelUpdate?: (pixel: 
 export function useFrameStateUpdates(
   frameId: string | null,
   callbacks?: {
+    onPixelUpdate?: (pixel: Pixel) => void
     onFreeze?: (isFrozen: boolean) => void
     onTitleUpdate?: (title: string) => void
     onPermissionsUpdate?: (permissions: string) => void
@@ -188,6 +189,9 @@ export function useFrameStateUpdates(
 
     subscribe((event) => {
       switch (event.type) {
+        case 'pixel':
+          callbacks?.onPixelUpdate?.(event.data)
+          break
         case 'freeze':
           callbacks?.onFreeze?.(event.isFrozen)
           break
@@ -204,10 +208,11 @@ export function useFrameStateUpdates(
     })
 
     return unsubscribe
-  }, [frameId, subscribe, unsubscribe, callbacks])
+  }, [frameId, subscribe, unsubscribe, callbacks?.onTitleUpdate, callbacks?.onPermissionsUpdate, callbacks?.onFreeze, callbacks?.onDelete])
 
   return { isSubscribed }
 }
+
 
 /**
  * Hook for offline detection and handling

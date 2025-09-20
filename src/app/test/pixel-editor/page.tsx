@@ -130,6 +130,7 @@ export default function PixelEditorTestPage() {
               pixels={pixels}
               onPixelPlaced={handlePixelPlaced}
               onPixelUndone={handlePixelUndone}
+              showColorPalette={true}
             />
           </div>
 

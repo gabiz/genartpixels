@@ -141,12 +141,13 @@ async function getUserFrames(userHandle: string) {
   console.log("frames: ", contributedFrames)
 
   const uniqueContributedFrames = contributedFrames?.map((frame) => {
+      const statsData = Array.isArray(frame.frame_stats) ? frame.frame_stats[0] : frame.frame_stats
       return {
         frame_id: frame.id,
         last_contribution: frame.updated_at,
         frame: {
           ...frame,
-          stats: frame.frame_stats,
+          stats: statsData,
         },
        }
   }, [] as Array<{ frame_id: string; last_contribution: string; frame: FrameWithStats }>)
