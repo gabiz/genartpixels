@@ -9,7 +9,6 @@ export {
   useFrameRealtime,
   useRealtimeConnection,
   useFrameBroadcast,
-  usePixelUpdates,
   useFrameStateUpdates,
   useOfflineDetection
 } from './hooks'

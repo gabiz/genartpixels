@@ -58,8 +58,8 @@ export function UserProfile({ user, ownedFrames, contributedFrames }: UserProfil
 
   const [ isCreationDialogOpen, setCreationDialogOpen ] = useState<boolean>(false)
   
-  const handleFrameCreated = useCallback((frame: any) => {
-    console.log('frame created:', frame)
+  const handleFrameCreated = useCallback(() => {
+    // console.log('frame created:', frame)
   }, [])
 
   const handleCreationOnClose = useCallback(() => {

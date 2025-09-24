@@ -149,27 +149,6 @@ export function useFrameBroadcast() {
 }
 
 /**
- * Hook for handling pixel updates in real-time
- */
-// export function usePixelUpdates(frameId: string | null, onPixelUpdate?: (pixel: Pixel) => void) {
-//   const { subscribe, unsubscribe, isSubscribed } = useFrameRealtime(frameId)
-
-//   useEffect(() => {
-//     if (!frameId) return
-
-//     subscribe((event) => {
-//       if (event.type === 'pixel') {
-//         onPixelUpdate?.(event.data)
-//       }
-//     })
-
-//     return unsubscribe
-//   }, [frameId, subscribe, unsubscribe, onPixelUpdate])
-
-//   return { isSubscribed }
-// }
-
-/**
  * Hook for handling frame state changes in real-time
  */
 export function useFrameStateUpdates(

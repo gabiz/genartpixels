@@ -191,6 +191,7 @@ export function PixelEditor({
       })
 
       const result = await response.json()
+      console.log("undone: ", result)
 
       if (result.success) {
         const { x, y, color } = result.undonePixel
@@ -285,7 +286,8 @@ export function PixelEditor({
           </div>
 
           {/* Canvas */}
-          <div className="flex-1 border rounded-lg overflow-hidden bg-gray-100">
+          {/* <div className="flex-1 border rounded-lg overflow-hidden bg-gray-100"> */}
+          <div className="border rounded-lg overflow-hidden bg-gray-100 h-96 sm:h-[31.25rem] lg:h-[37.5rem]">
             <FrameCanvas
               ref={canvasRef}
               frame={frame}

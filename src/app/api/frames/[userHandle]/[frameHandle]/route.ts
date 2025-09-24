@@ -21,7 +21,8 @@ import type {
   APIError,
   FrameWithStats,
   FramePermission,
-  FramePermissionType
+  FramePermissionType,
+  Pixel
 } from '@/lib/types'
 
 interface RouteParams {
@@ -140,10 +141,10 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     const pageSize = 1000
     let from = 0
     let to = pageSize - 1
-    let all: any[] = []
+    let all: Pixel[] = []
     let done = false
-    let pixelsError = null
-    let recentPixels: any[] = []
+    // let pixelsError = null
+    // let recentPixels: any[] = []
 
     while (!done) {
       const { data: recentPixels, error: pixelsError } = await supabase
@@ -163,15 +164,16 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
         from += pageSize;
         to += pageSize;
       }
+
+      if (pixelsError) {
+        console.error('Error fetching recent pixels:', pixelsError)
+        return NextResponse.json(
+          { success: false, error: 'Failed to load frame data', code: 'DATABASE_ERROR' } as APIError,
+          { status: 500 }
+        )
+      }
     }
 
-    if (pixelsError) {
-      console.error('Error fetching recent pixels:', pixelsError)
-      return NextResponse.json(
-        { success: false, error: 'Failed to load frame data', code: 'DATABASE_ERROR' } as APIError,
-        { status: 500 }
-      )
-    }
 
     const response: APIResponse<FrameResponse> = {
       success: true,

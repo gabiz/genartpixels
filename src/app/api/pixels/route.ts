@@ -449,6 +449,7 @@ export async function DELETE(request: NextRequest) {
       .delete()
       .eq('id', lastPixel.id)
 
+    console.log("deleted: ", lastPixel.id, deleteError)
     if (deleteError) {
       console.error('Error deleting pixel:', deleteError)
       return NextResponse.json(

@@ -10,7 +10,6 @@ import {
   useFrameRealtime,
   useRealtimeConnection,
   useFrameBroadcast,
-  usePixelUpdates,
   useFrameStateUpdates,
   useOfflineDetection
 } from '@/lib/realtime'
