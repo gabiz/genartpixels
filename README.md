@@ -4,6 +4,10 @@ GenArtPixels is a collaborative digital canvas where users create, share, and ev
 
 ---
 
+## Demo
+
+https://genartpixels.vercel.app/
+
 ## Features
 
 - **Collaborative Pixel Art:** Multiple users can contribute to a single frame in real time.
